@@ -1,6 +1,6 @@
 /**
  * FENDIX.JS
- * Final comit for Fendix website
+ * Final comit for Fendix website - test
  */
 
 
