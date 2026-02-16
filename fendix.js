@@ -1,16 +1,5 @@
 /**
  * FENDIX.JS
- * Core JavaScript for Fendix website
- * 
- * Includes:
- * - Accordion CSS
- * - Modal system
- * - Finsweet lazy loader + filter scroll
- * - Social share
- * - Back button
- * - Progress navigation
- * - Form enhancement
- * - Smooth scroll
  */
 
 (function() {
