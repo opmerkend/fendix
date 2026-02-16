@@ -405,7 +405,9 @@
    Topbar Links
 ========================= */
 .topbar-link {
-  transition: opacity 200ms cubic-bezier(0.645, 0.045, 0.355, 1);
+  transition: background-color 180ms cubic-bezier(0.645, 0.045, 0.355, 1),
+              color 180ms cubic-bezier(0.645, 0.045, 0.355, 1),
+              padding 240ms cubic-bezier(0.645, 0.045, 0.355, 1);
 }
 
 @media (hover: hover) {
@@ -443,7 +445,9 @@
 }
 
 .link-list {
-  transition: color 200ms cubic-bezier(.22,.61,.36,1);
+  transition-property: background-color, color, padding;
+  transition-duration: 200ms;
+  transition-timing-function: cubic-bezier(0.645, 0.045, 0.355, 1);
 }
 
 .link-list:hover .button-icon_slot {
