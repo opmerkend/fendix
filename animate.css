@@ -1,10 +1,6 @@
 /* ==========================================================================
    ANIMATE.CSS - FENDIX
    CSS Animations triggered by data-animate attribute
-   
-   Usage: <div data-animate="fadein">...</div>
-   JS adds .is-inview class when element enters viewport
-   JS removes .is-inview class when element leaves viewport (retrigger)
    ========================================================================== */
 
 /* =========================
@@ -81,6 +77,49 @@
 [data-animate="stagger"].is-inview > *:nth-child(8) { transition-delay: 0.7s; opacity: 1; transform: translateY(0); }
 [data-animate="stagger"].is-inview > *:nth-child(9) { transition-delay: 0.8s; opacity: 1; transform: translateY(0); }
 [data-animate="stagger"].is-inview > *:nth-child(10) { transition-delay: 0.9s; opacity: 1; transform: translateY(0); }
+
+/* =========================
+   STACK IMAGE
+   Usage: <div data-animate="stack-image">
+            <img class="cta-stackimage is-left">
+            <img class="cta-stackimage is-right">
+          </div>
+   ========================= */
+@keyframes stackimage-left {
+  from { transform: translateX(70%); }
+  to { transform: translateX(-40%); }
+}
+
+@keyframes stackimage-right {
+  from { transform: translateX(-70%); }
+  to { transform: translateX(40%); }
+}
+
+@keyframes stackimage-scale {
+  from { transform: scale(1.25); }
+  to { transform: scale(1); }
+}
+
+[data-animate="stack-image"] .cta-stackimage {
+  animation: stackimage-scale 0.4s ease-out 0.2s both;
+  animation-play-state: paused;
+}
+
+[data-animate="stack-image"] .cta-stackimage.is-left {
+  animation: stackimage-left 0.4s ease-out 0.1s both;
+  animation-play-state: paused;
+}
+
+[data-animate="stack-image"] .cta-stackimage.is-right {
+  animation: stackimage-right 0.4s ease-out 0.1s both;
+  animation-play-state: paused;
+}
+
+[data-animate="stack-image"].is-inview .cta-stackimage,
+[data-animate="stack-image"].is-inview .cta-stackimage.is-left,
+[data-animate="stack-image"].is-inview .cta-stackimage.is-right {
+  animation-play-state: running;
+}
 
 /* =========================
    DELAY MODIFIERS
