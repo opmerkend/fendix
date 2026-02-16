@@ -1,1 +1,143 @@
+/* ==========================================================================
+   ANIMATE.CSS - FENDIX
+   CSS Animations triggered by data-animate attribute
+   ========================================================================== */
 
+/* =========================
+   ANIMATION SETTINGS
+   ========================= */
+:root {
+  --animate-duration: 0.6s;
+  --animate-delay: 0s;
+  --animate-easing: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --animate-distance: 30px;
+}
+
+/* =========================
+   BASE - ALL ANIMATIONS
+   ========================= */
+[data-animate] {
+  will-change: opacity, transform;
+}
+
+/* =========================
+   FADE IN (up)
+   ========================= */
+[data-animate="fadein"],
+[data-animate="fade-up"] {
+  opacity: 0;
+  transform: translateY(var(--animate-distance));
+  transition: 
+    opacity var(--animate-duration) var(--animate-easing),
+    transform var(--animate-duration) var(--animate-easing);
+  transition-delay: var(--animate-delay);
+}
+
+[data-animate="fadein"].is-inview,
+[data-animate="fade-up"].is-inview {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* =========================
+   FADE (opacity only)
+   ========================= */
+[data-animate="fade"] {
+  opacity: 0;
+  transition: opacity var(--animate-duration) var(--animate-easing);
+  transition-delay: var(--animate-delay);
+}
+
+[data-animate="fade"].is-inview {
+  opacity: 1;
+}
+
+/* =========================
+   STAGGER CHILDREN
+   Usage: <div data-animate="stagger">
+            <div>Item 1</div>
+            <div>Item 2</div>
+          </div>
+   ========================= */
+[data-animate="stagger"] > * {
+  opacity: 0;
+  transform: translateY(var(--animate-distance));
+  transition: 
+    opacity var(--animate-duration) var(--animate-easing),
+    transform var(--animate-duration) var(--animate-easing);
+}
+
+[data-animate="stagger"].is-inview > *:nth-child(1) { transition-delay: 0s; opacity: 1; transform: translateY(0); }
+[data-animate="stagger"].is-inview > *:nth-child(2) { transition-delay: 0.1s; opacity: 1; transform: translateY(0); }
+[data-animate="stagger"].is-inview > *:nth-child(3) { transition-delay: 0.2s; opacity: 1; transform: translateY(0); }
+[data-animate="stagger"].is-inview > *:nth-child(4) { transition-delay: 0.3s; opacity: 1; transform: translateY(0); }
+[data-animate="stagger"].is-inview > *:nth-child(5) { transition-delay: 0.4s; opacity: 1; transform: translateY(0); }
+[data-animate="stagger"].is-inview > *:nth-child(6) { transition-delay: 0.5s; opacity: 1; transform: translateY(0); }
+[data-animate="stagger"].is-inview > *:nth-child(7) { transition-delay: 0.6s; opacity: 1; transform: translateY(0); }
+[data-animate="stagger"].is-inview > *:nth-child(8) { transition-delay: 0.7s; opacity: 1; transform: translateY(0); }
+[data-animate="stagger"].is-inview > *:nth-child(9) { transition-delay: 0.8s; opacity: 1; transform: translateY(0); }
+[data-animate="stagger"].is-inview > *:nth-child(10) { transition-delay: 0.9s; opacity: 1; transform: translateY(0); }
+
+/* =========================
+   STACK IMAGE
+   Usage: <div data-animate="stack-image">
+            <img class="cta-stackimage is-left">
+            <img class="cta-stackimage is-right">
+          </div>
+   ========================= */
+@keyframes stackimage-left {
+  from { transform: translateX(70%); }
+  to { transform: translateX(-40%); }
+}
+
+@keyframes stackimage-right {
+  from { transform: translateX(-70%); }
+  to { transform: translateX(40%); }
+}
+
+@keyframes stackimage-scale {
+  from { transform: scale(1.25); }
+  to { transform: scale(1); }
+}
+
+[data-animate="stack-image"] .cta-stackimage {
+  animation: stackimage-scale 0.4s ease-out 0.2s both;
+  animation-play-state: paused;
+}
+
+[data-animate="stack-image"] .cta-stackimage.is-left {
+  animation: stackimage-left 0.4s ease-out 0.1s both;
+  animation-play-state: paused;
+}
+
+[data-animate="stack-image"] .cta-stackimage.is-right {
+  animation: stackimage-right 0.4s ease-out 0.1s both;
+  animation-play-state: paused;
+}
+
+[data-animate="stack-image"].is-inview .cta-stackimage,
+[data-animate="stack-image"].is-inview .cta-stackimage.is-left,
+[data-animate="stack-image"].is-inview .cta-stackimage.is-right {
+  animation-play-state: running;
+}
+
+/* =========================
+   DELAY MODIFIERS
+   ========================= */
+[data-delay="1"] { --animate-delay: 0.1s; }
+[data-delay="2"] { --animate-delay: 0.2s; }
+[data-delay="3"] { --animate-delay: 0.3s; }
+[data-delay="4"] { --animate-delay: 0.4s; }
+[data-delay="5"] { --animate-delay: 0.5s; }
+
+/* =========================
+   REDUCED MOTION
+   ========================= */
+@media (prefers-reduced-motion: reduce) {
+  [data-animate],
+  [data-animate="stagger"] > * {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
