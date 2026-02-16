@@ -1,16 +1,6 @@
 /**
  * FENDIX.JS
  * Core JavaScript for Fendix website
- * 
- * Includes:
- * - Accordion CSS
- * - Modal system
- * - Finsweet lazy loader + filter scroll
- * - Social share
- * - Back button
- * - Progress navigation
- * - Form enhancement
- * - Smooth scroll
  */
 
 (function() {
@@ -326,73 +316,29 @@
     })();
 
     // =========================
-    // GSAP ANIMATIONS
+    // CSS ANIMATIONS (data-animate)
     // =========================
-    function initGSAP() {
-      if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
+    (function() {
+      var elements = document.querySelectorAll('[data-animate]');
+      if (!elements.length) return;
 
-      gsap.registerPlugin(ScrollTrigger);
-      
-      // Signal that GSAP is ready (enables CSS hide)
-      document.documentElement.classList.add('gsap-ready');
-
-      gsap.utils.toArray('[data-animate="fadein"]').forEach(function(el) {
-        gsap.fromTo(el, 
-          { opacity: 0, y: 30 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.8,
-            ease: 'power2.out',
-            scrollTrigger: {
-              trigger: el,
-              start: 'top 85%',
-              toggleActions: 'play none none none'
-            }
+      var observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-inview');
+          } else {
+            entry.target.classList.remove('is-inview');
           }
-        );
-      });
-
-      gsap.utils.toArray('[data-animate="reveal-list"]').forEach(function(container) {
-        var items = container.querySelectorAll('.col, .card, .item');
-        if (items.length === 0) return;
-
-        gsap.fromTo(items,
-          { opacity: 0, y: 40 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.6,
-            stagger: 0.1,
-            ease: 'power2.out',
-            scrollTrigger: {
-              trigger: container,
-              start: 'top 80%',
-              toggleActions: 'play none none none'
-            }
-          }
-        );
-      });
-
-      gsap.utils.toArray('[data-css-scroll="retrigger-both"]').forEach(function(el) {
-        ScrollTrigger.create({
-          trigger: el,
-          start: 'top 90%',
-          onEnter: function() { el.style.animationPlayState = 'running'; },
-          onLeave: function() { el.style.animationPlayState = 'paused'; },
-          onEnterBack: function() { el.style.animationPlayState = 'running'; },
-          onLeaveBack: function() { el.style.animationPlayState = 'paused'; }
         });
+      }, {
+        threshold: 0.1,
+        rootMargin: '0px 0px -10% 0px'
       });
-    }
 
-    var gsapCheck = setInterval(function() {
-      if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
-        clearInterval(gsapCheck);
-        initGSAP();
-      }
-    }, 100);
-    setTimeout(function() { clearInterval(gsapCheck); }, 5000);
+      elements.forEach(function(el) {
+        observer.observe(el);
+      });
+    })();
 
     // =========================
     // FORM ENHANCEMENT
