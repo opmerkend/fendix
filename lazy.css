@@ -5,68 +5,27 @@
 
 /* === SWIPER OVERFLOW === */
 .swiper,
-.swiper-wrapper, {
-  overflow: visible!important;
+.swiper-wrapper {
+  overflow: visible !important;
 }
 
-.value-slider_component,
-.value-slider_component .swiper {
-  overflow: visible;
+/* === GSAP ANIMATION FALLBACK === */
+/* Ensure elements are visible if GSAP fails to load */
+[data-animate] {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+/* Only hide when GSAP is ready (class added by fendix.js) */
+.gsap-ready [data-animate="fadein"],
+.gsap-ready [data-animate="reveal-list"] > .col,
+.gsap-ready [data-animate="reveal-list"] > .card,
+.gsap-ready [data-animate="reveal-list"] > .item {
+  opacity: 0;
+  transform: translateY(30px);
 }
 
 /* === CTA SECTION FADE === */
-.cta-section_fade {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 40%;
-  background: linear-gradient(to top, var(--swatch--dark-secondary), transparent);
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.5s ease;
-}
-
-.cta-section_fade.visible {
-  opacity: 1;
-}
-
-/* === STACK IMAGE ANIMATIONS === */
-@keyframes stackimage-left {
-  from { transform: translateX(70%); }
-  to { transform: translateX(-40%); }
-}
-
-@keyframes stackimage-right {
-  from { transform: translateX(-70%); }
-  to { transform: translateX(40%); }
-}
-
-@keyframes stackimage-scale {
-  from { transform: scale(1.25); }
-  to { transform: scale(1); }
-}
-
-.cta-stackimage.is-left {
-  animation: stackimage-left 0.4s ease-out 0.1s both;
-  animation-play-state: paused;
-}
-
-.cta-stackimage.is-right {
-  animation: stackimage-right 0.4s ease-out 0.1s both;
-  animation-play-state: paused;
-}
-
-.cta-stackimage {
-  animation: stackimage-scale 0.4s ease-out 0.2s both;
-  animation-play-state: paused;
-}
-
-[data-css-scroll="retrigger-both"] .cta-stackimage,
-[data-css-scroll="retrigger-both"] .cta-stackimage.is-left,
-[data-css-scroll="retrigger-both"] .cta-stackimage.is-right {
-  animation-play-state: running;
-}
 
 /* === HOVER EFFECTS === */
 @media (hover: hover) {
