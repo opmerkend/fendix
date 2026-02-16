@@ -1,326 +1,240 @@
 /* ==========================================================================
-   LAZY CSS
-   Load with: media="print" onload="this.media='all'"
-   Contains: animations, interactions, hover effects (non-critical)
+   LAZY.CSS - FENDIX
+   Non-critical styles loaded asynchronously
    ========================================================================== */
 
-/* =========================
-   Heading Breathe Animation
-========================= */
-[data-wf--heading-display--variant="gradient"] {
-  animation: breathe 4s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+/* === CTA SECTION FADE === */
+.cta-section_fade {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40%;
+  background: linear-gradient(to top, var(--swatch--dark-secondary), transparent);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.5s ease;
 }
 
-[data-wf--heading-display--variant="gradient"] + h1,
-[data-wf--heading-display--variant="gradient"] + h2 {
-  animation: breathe 4s cubic-bezier(0.45, 0, 0.55, 1) infinite;
-  animation-delay: 0.4s;
+.cta-section_fade.visible {
+  opacity: 1;
 }
 
-@keyframes breathe {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(0.1em); }
+/* === STACK IMAGE ANIMATIONS === */
+@keyframes stackimage-left {
+  from { transform: translateX(70%); }
+  to { transform: translateX(-40%); }
 }
 
-/* =========================
-   Scroll Animations
-========================= */
-@keyframes reveal { 
-  from { 
-    opacity: 0; 
-    transform: translate3d(0, 2rem, 0); 
-  } 
-  to { 
-    opacity: 1; 
-    transform: translate3d(0, 0, 0); 
-  } 
+@keyframes stackimage-right {
+  from { transform: translateX(-70%); }
+  to { transform: translateX(40%); }
 }
 
-@keyframes reveal-mobile { 
-  from { opacity: 0; } 
-  to { opacity: 1; } 
+@keyframes stackimage-scale {
+  from { transform: scale(1.25); }
+  to { transform: scale(1); }
 }
 
-[data-animate="reveal"] > * { 
-  animation: reveal 0.4s ease-out calc((0.1s * var(--i)) + 0s) both;
-  will-change: transform, opacity;
-  backface-visibility: hidden;
+.cta-stackimage.is-left {
+  animation: stackimage-left 0.4s ease-out 0.1s both;
+  animation-play-state: paused;
 }
 
-[data-animate="reveal-list"] > :nth-child(1) { --i: 0; }
-[data-animate="reveal-list"] > :nth-child(2) { --i: 1; }
-[data-animate="reveal-list"] > :nth-child(3) { --i: 2; }
-[data-animate="reveal-list"] > :nth-child(4) { --i: 3; }
-[data-animate="reveal-list"] > :nth-child(5) { --i: 4; }
-[data-animate="reveal-list"] > :nth-child(6) { --i: 5; }
-
-.reset-animations,
-.reset-animations * {
-  animation: none !important;
+.cta-stackimage.is-right {
+  animation: stackimage-right 0.4s ease-out 0.1s both;
+  animation-play-state: paused;
 }
 
-[data-css-scroll].animation-ready,
-[data-css-scroll].animation-ready * {
-  animation-duration: 0s !important;
-  animation-direction: reverse !important;
+.cta-stackimage {
+  animation: stackimage-scale 0.4s ease-out 0.2s both;
+  animation-play-state: paused;
 }
 
-@media (max-width: 767px) {
-  [data-animate="reveal"] > * { 
-    animation-name: reveal-mobile;
-    will-change: opacity;
+[data-css-scroll="retrigger-both"] .cta-stackimage,
+[data-css-scroll="retrigger-both"] .cta-stackimage.is-left,
+[data-css-scroll="retrigger-both"] .cta-stackimage.is-right {
+  animation-play-state: running;
+}
+
+/* === HOVER EFFECTS === */
+@media (hover: hover) {
+  .card:hover .card-image {
+    transform: scale(1.05);
+  }
+  
+  .card-image {
+    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+  
+  .nav-subitem:hover .nav-subitem_iconwrap {
+    transform: scale(1.05);
+  }
+  
+  .nav-subitem_iconwrap {
+    transition: transform 0.3s ease;
+  }
+  
+  .footer-link:hover {
+    color: var(--swatch--proactive-purple);
+  }
+  
+  .footer-link {
+    transition: color 0.2s ease;
+  }
+  
+  .back-to-top:hover {
+    opacity: 0.8;
+  }
+  
+  .back-to-top {
+    transition: opacity 0.2s ease;
   }
 }
 
+/* === FOCUS STATES === */
+.button:focus-visible,
+.navbar_link:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--swatch--proactive-purple);
+  outline-offset: 2px;
+}
+
+/* === LOADING STATES === */
+.is-loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* === SECTION TRANSITIONS === */
+.section {
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+/* === BADGE ANIMATIONS === */
+.footer-badge {
+  transition: transform 0.3s ease;
+}
+
+@media (hover: hover) {
+  .footer-badge:hover {
+    transform: scale(1.05);
+  }
+}
+
+/* === SCROLL PROGRESS (optional) === */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--swatch--proactive-purple), var(--swatch--dark-purple));
+  transform-origin: left;
+  transform: scaleX(0);
+  z-index: 9999;
+  pointer-events: none;
+}
+
+/* === FILTER TRANSITIONS === */
+[data-filter-item] {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+[data-filter-item].is-hidden {
+  opacity: 0;
+  transform: scale(0.95);
+  pointer-events: none;
+}
+
+/* === SMOOTH APPEAR === */
+.appear {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.appear.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* === TESTIMONIAL CARDS === */
+.testimonial-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+@media (hover: hover) {
+  .testimonial-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* === IMAGE REVEAL === */
+.image-reveal {
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path 0.8s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.image-reveal.is-revealed {
+  clip-path: inset(0 0 0 0);
+}
+
+/* === TEAM MEMBER CARDS === */
+.team-card_image {
+  transition: transform 0.4s ease;
+}
+
+@media (hover: hover) {
+  .team-card:hover .team-card_image {
+    transform: scale(1.08);
+  }
+}
+
+/* === NAV INDICATOR === */
+.nav-indicator {
+  position: absolute;
+  bottom: 0;
+  height: 2px;
+  background: var(--swatch--proactive-purple);
+  transition: left 0.3s ease, width 0.3s ease;
+}
+
+/* === PARALLAX HELPER === */
+[data-parallax] {
+  will-change: transform;
+}
+
+/* === REDUCED MOTION === */
 @media (prefers-reduced-motion: reduce) {
-  [data-animate="reveal"] > *,
-  .background-chevron,
-  .modal-background-chevron {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  .cta-stackimage,
+  .cta-stackimage.is-left,
+  .cta-stackimage.is-right {
     animation: none !important;
-    opacity: 1 !important;
     transform: none !important;
   }
 }
 
-/* =========================
-   Chevron Animations
-========================= */
-@keyframes chevron-move {
-  0% { transform: translate3d(-7.5vw, 0, 0) scale(1); opacity: 0.65; }
-  15% { transform: translate3d(-4vw, 0, 0) scale(1.05); opacity: 0.75; }
-  35% { transform: translate3d(2vw, 0, 0) scale(1.12); opacity: 0.9; }
-  50% { transform: translate3d(7.5vw, 0, 0) scale(1.2); opacity: 1; }
-  65% { transform: translate3d(4vw, 0, 0) scale(1.12); opacity: 0.9; }
-  85% { transform: translate3d(-2vw, 0, 0) scale(1.05); opacity: 0.75; }
-  100% { transform: translate3d(-7.5vw, 0, 0) scale(1); opacity: 0.65; }
-}
-
-@keyframes chevron-breathe {
-  0% { transform: translate3d(0, 0, 0) scale(1); opacity: 0.65; }
-  15% { transform: translate3d(-1vw, 0, 0) scale(1.05); opacity: 0.75; }
-  35% { transform: translate3d(-2.5vw, 0, 0) scale(1.12); opacity: 0.9; }
-  50% { transform: translate3d(-5vw, 0, 0) scale(1.2); opacity: 1; }
-  65% { transform: translate3d(-2.5vw, 0, 0) scale(1.12); opacity: 0.9; }
-  85% { transform: translate3d(-1vw, 0, 0) scale(1.05); opacity: 0.75; }
-  100% { transform: translate3d(0, 0, 0) scale(1); opacity: 0.65; }
-}
-
-.background-chevron {
-  animation: chevron-move 24s linear infinite;
-  will-change: transform, opacity;
-  backface-visibility: hidden;
-}
-
-.background-chevron.full {
-  animation: chevron-breathe 12s linear infinite;
-}
-
-.modal-background-chevron {
-  animation: chevron-breathe 16s linear infinite;
-  will-change: transform, opacity;
-  backface-visibility: hidden;
-}
-
-.background-chevron_cta {
-  animation: chevron-breathe 16s linear infinite;
-  will-change: transform, opacity;
-  backface-visibility: hidden;
-}
-
-/* =========================
-   Accordion (base styling)
-========================= */
-.accordion-icon_wrap { 
-  color: var(--swatch--dark-purple);
-  transition: transform 0.6s cubic-bezier(0.625, 0.05, 0, 1);
-}
-
-.accordion-icon_faq,
-.accordion_css_heading {
-  transition: transform 0.6s cubic-bezier(0.625, 0.05, 0, 1);
-}
-
-.accordion-icon_faq { 
-  transform: rotate(45deg);
-}
-
-/* Nav Accordion */
-.accordion-css__item.is-nav .nav-tab {
-  transition: background 0.4s cubic-bezier(0.625, 0.05, 0, 1);
-}
-
-@media (min-width: 992px) {
-  .accordion-css__item-icon.is-nav {
-    transform: rotate(-90deg);
-  }
-}
-
-/* =========================
-   Tabs
-========================= */
-.nav-tab_icon.default { opacity: 1; }
-.nav-tab_icon.current { opacity: 0; }
-
-.nav-tab.w--current .nav-tab_icon.current { 
-  opacity: 1; 
-}
-
-.nav-tab.w--current .nav-tab_icon.default { 
-  opacity: 0; 
-}
-
-.nav-tab.w--current .nav-tab_icon_bg {
-  opacity: 0;
-  transform: scale(0.1);
-}
-
-/* =========================
-   Clip-path Effects
-========================= */
-.nav-subitem_iconwrap,
-.nav-cta_image,
-.main-card-image_wrap,
-.glass-icon_wrapper,
-.has-clippath,
-.team-card-image_wrapper,
-.testimonial-card {
-  clip-path: polygon(0 0, 100% 0, 100% 100%, 100% 100%, 0 100%);
-  transition: clip-path 280ms var(--transition-button-ease);
-}
-
-@media (hover: hover) {
-  .nav-subitem:hover .nav-subitem_iconwrap,
-  .nav-cta_wrapper:hover .nav-cta_image,
-  .main-card:hover .main-card-image_wrap,
-  .main-card:hover .glass-icon_wrapper {
-    clip-path: polygon(
-      0 0, 
-      100% 0, 
-      100% calc(100% - var(--_utility---cutout-xs)), 
-      calc(100% - var(--_utility---cutout-xs)) 100%, 
-      0 100%
-    );
-  }
-
-  .team-card:hover .team-card-image_wrapper,
-  .testimonial-card:hover,
-  .video-button_wrap {
-    clip-path: polygon(
-      0 0, 
-      100% 0, 
-      100% calc(100% - var(--_utility---cutout-m)), 
-      calc(100% - var(--_utility---cutout-m)) 100%, 
-      0 100%
-    );
-  }
-}
-
-/* =========================
-   Card Interactions
-========================= */
-.team-card_blur {
-  opacity: 0;
-  transform: scale(0.25);
-  transition: transform 300ms, opacity 200ms;
-}
-
-@media (hover: hover) {
-  .main-card:hover .card-background_hover { 
-    height: 100%; 
+/* === PRINT STYLES === */
+@media print {
+  .navbar,
+  .topbar,
+  .footer,
+  .modal-wrapper,
+  .nav-overlay {
+    display: none !important;
   }
   
-  .main-card:hover .card-title { 
-    color: var(--swatch--dark-purple); 
+  .section {
+    break-inside: avoid;
   }
-  
-  .main-card:hover .card-meta { 
-    background: var(--swatch--clear-grey-200); 
-  }
-  
-  .main-card.is-resource.is-dark .card-title { 
-    color: inherit; 
-  }
-  
-  .main-card.is-resource.is-dark .card-meta { 
-    color: inherit; 
-  }
-  
-  .main-card.is-service:hover .button,
-  .main-card.is-partner-resource:hover .button { 
-    color: white; 
-  }
-  
-  .main-card:hover .button-background,
-  .team-card:hover .button-background {
-    transform: scale(0.1);
-    opacity: 0;
-    transition: opacity 360ms, transform 360ms;
-  }
-  
-  .team-card:hover .team-card_blur {
-    opacity: 0.75;
-    transform: scale(0.9);
-  }
-  
-  .team-card:hover .button-icon_slot.in-card { 
-    transform: rotate(0); 
-  }
-  
-  .case-card:hover .case-card_content {
-    color: var(--_theme---body--body-font-color);
-    background: rgba(255, 255, 255, 0.99);
-    transform: scale(0.95);
-  }
-  
-  .case-card:hover .card-title.is-case { 
-    color: var(--_theme---headings--heading-font-colour); 
-  }
-  
-  .case-card:hover .card-meta { 
-    background: var(--swatch--clear-grey-100); 
-  }
-}
-
-/* =========================
-   Footer
-========================= */
-.footer-link .footer-chevron {
-  width: 0;
-  transition: width 300ms cubic-bezier(0.645, 0.045, 0.355, 1);
-}
-
-.footer-link:hover .footer-chevron { 
-  width: var(--button--button-icon); 
-}
-
-.footer-link p {
-  opacity: 0.8;
-  transition: opacity 200ms cubic-bezier(0.645, 0.045, 0.355, 1);
-}
-
-.footer-link:hover p { 
-  opacity: 0.6; 
-}
-
-/* =========================
-   Misc Interactions
-========================= */
-.modal__btn-close:hover .button-icon.is-modal { 
-  transform: rotate(0); 
-}
-
-.link-list .button-icon_slot {
-  color: var(--swatch--proactive-purple);
-}
-
-.link-list:hover {
-  color: var(--swatch--proactive-purple);
-}
-
-.link-list {
-  transition: color 200ms cubic-bezier(.22,.61,.36,1);
-}
-
-.link-list:hover .button-icon_slot {
-  color: var(--swatch--dark-purple);
 }
