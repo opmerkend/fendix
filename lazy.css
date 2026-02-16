@@ -3,6 +3,21 @@
    Non-critical styles loaded asynchronously
    ========================================================================== */
 
+/* === SWIPER OVERFLOW === */
+.swiper,
+.swiper-wrapper,
+.swiper.is-case,
+.swiper-wrapper.is-case,
+.swiper.is-team,
+.swiper-wrapper.is-team {
+  overflow: visible;
+}
+
+.value-slider_component,
+.value-slider_component .swiper {
+  overflow: visible;
+}
+
 /* === CTA SECTION FADE === */
 .cta-section_fade {
   position: absolute;
