@@ -1,11 +1,93 @@
+/* ==========================================================================
+   FENDIX.JS (optimized)
+   Load with: defer attribute in footer
+   ========================================================================== */
+
 gsap.registerPlugin(ScrollTrigger, Observer);
-<!-- Interactions -->
+
 (function() {
   'use strict';
 
-  var init = function() {
+  function init() {
     
-    // === SCROLL ANIMATION FALLBACK (Firefox) ===
+    // =========================
+    // NAVBAR STATE
+    // =========================
+    (function() {
+      var de = document.documentElement;
+      var nav = document.querySelector('.navbar');
+      if (!nav) return;
+
+      var navBg = nav.querySelector('.navbar_scroll_background');
+      var topBg = document.querySelector('.topbar_background');
+      var overlay = document.querySelector('.nav-overlay');
+      var isDarkStart = nav.getAttribute('start-color') === 'dark';
+      
+      var scrolled = window.scrollY > 0;
+      var uiOpen = false;
+      var ticking = false;
+
+      function update() {
+        var active = scrolled || uiOpen;
+        
+        de.classList.toggle('is-scrolled', active);
+        if (navBg) navBg.classList.toggle('open', active);
+        if (topBg) topBg.classList.toggle('open', active);
+        
+        if (isDarkStart) {
+          de.classList.toggle('navbar-top-dark', !active);
+        }
+        
+        if (overlay) {
+          var isDesktop = window.innerWidth >= 992;
+          var ddOpen = nav.querySelector('.w-dropdown-toggle.w--open');
+          var menuOpen = nav.querySelector('.w-nav-button.w--open, .navbar_menu-button.w--open');
+          overlay.classList.toggle('open', isDesktop ? !!ddOpen : !!menuOpen);
+        }
+      }
+
+      // Scroll (throttled)
+      window.addEventListener('scroll', function() {
+        if (!ticking) {
+          requestAnimationFrame(function() {
+            scrolled = window.scrollY > 0;
+            update();
+            ticking = false;
+          });
+          ticking = true;
+        }
+      }, { passive: true });
+
+      // UI state (click-based)
+      nav.addEventListener('click', function() {
+        requestAnimationFrame(function() {
+          uiOpen = !!nav.querySelector('.w-dropdown-toggle.w--open, .w-nav-button.w--open, .navbar_menu-button.w--open');
+          update();
+        });
+      });
+
+      // ESC close
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && uiOpen) {
+          nav.querySelectorAll('.w-dropdown-toggle.w--open, .w-nav-button.w--open, .navbar_menu-button.w--open')
+            .forEach(function(el) { el.click(); });
+        }
+      });
+
+      // Overlay close
+      if (overlay) {
+        overlay.addEventListener('click', function() {
+          nav.querySelectorAll('.w-dropdown-toggle.w--open, .w-nav-button.w--open, .navbar_menu-button.w--open')
+            .forEach(function(el) { el.click(); });
+        });
+      }
+
+      update();
+    })();
+
+    // =========================
+    // SCROLL ANIMATION FALLBACK (Firefox)
+    // =========================
     if (!CSS.supports('animation-timeline: view()')) {
       document.documentElement.classList.add('no-css-scroll-timeline');
       
@@ -42,7 +124,9 @@ gsap.registerPlugin(ScrollTrigger, Observer);
       }
     }
 
-    // === ACCORDION ===
+    // =========================
+    // ACCORDION
+    // =========================
     document.querySelectorAll('[data-accordion-css-init]').forEach(function(accordion) {
       if (accordion._init) return;
       accordion._init = true;
@@ -67,20 +151,22 @@ gsap.registerPlugin(ScrollTrigger, Observer);
       });
     });
 
-    // === MODAL ===
+    // =========================
+    // MODAL
+    // =========================
     var modals = document.querySelectorAll('[data-modal-name]');
     
     if (modals.length) {
       var body = document.body;
       
-      var closeAll = function() {
+      function closeAll() {
         modals.forEach(function(m) { m.dataset.modalStatus = 'not-active'; });
         document.querySelectorAll('[data-modal-group-status]').forEach(function(g) {
           g.dataset.modalGroupStatus = 'not-active';
         });
         body.style.overflow = '';
         body.classList.remove('modal-locked');
-      };
+      }
 
       document.addEventListener('click', function(e) {
         var trigger = e.target.closest('[data-modal-target]');
@@ -93,7 +179,6 @@ gsap.registerPlugin(ScrollTrigger, Observer);
 
           e.preventDefault();
           closeAll();
-
           modal.dataset.modalStatus = 'active';
 
           var wrapper = modal.closest('[data-modal-group-status]');
@@ -104,9 +189,7 @@ gsap.registerPlugin(ScrollTrigger, Observer);
           return;
         }
 
-        if (e.target.closest('[data-modal-close]')) {
-          closeAll();
-        }
+        if (e.target.closest('[data-modal-close]')) closeAll();
       });
 
       document.addEventListener('keydown', function(e) {
@@ -116,18 +199,23 @@ gsap.registerPlugin(ScrollTrigger, Observer);
       });
     }
 
-    // === CURRENT YEAR ===
+    // =========================
+    // CURRENT YEAR
+    // =========================
     var year = new Date().getFullYear().toString();
     document.querySelectorAll('[data-current-year]').forEach(function(el) {
       el.textContent = year;
     });
 
-    // === GSAP MARQUEE ===
+    // =========================
+    // GSAP MARQUEE
+    // =========================
     if (typeof initDraggableMarquee === 'function') {
       try { initDraggableMarquee(); } catch (e) { console.error('Marquee error:', e); }
     }
-  };
+  }
 
+  // Initialize
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init, { once: true });
   } else {
