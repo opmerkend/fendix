@@ -1,12 +1,21 @@
 /**
  * FENDIX.JS
- * Complete JavaScript for Fendix website
+ * Core JavaScript for Fendix website
+ * 
+ * Includes:
+ * - Accordion CSS
+ * - Modal system
+ * - Finsweet lazy loader + filter scroll
+ * - Social share
+ * - Back button
+ * - Progress navigation
+ * - Form enhancement
+ * - Smooth scroll
  */
 
 (function() {
   'use strict';
 
-  // Wait for DOM ready
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {
@@ -17,12 +26,7 @@
     // =========================
     // NAVBAR STATE
     // =========================
-    // Note: Core navbar logic is in head.html for immediate response
-    // This section intentionally minimal - head script handles:
-    // - Scroll state
-    // - Menu/dropdown observers  
-    // - Dark state toggle
-    // - Overlay toggle
+    // Core navbar logic is in head.html for immediate response
 
     // =========================
     // ACCORDION CSS
@@ -86,7 +90,6 @@
         document.body.style.paddingRight = '';
       }
 
-      // Open triggers
       document.querySelectorAll('[data-modal-target]').forEach(function(trigger) {
         trigger.addEventListener('click', function(e) {
           var target = trigger.getAttribute('data-modal-target');
@@ -97,7 +100,6 @@
         });
       });
 
-      // Close triggers
       document.querySelectorAll('[data-modal-close]').forEach(function(closer) {
         closer.addEventListener('click', function(e) {
           e.preventDefault();
@@ -105,7 +107,6 @@
         });
       });
 
-      // Escape key
       document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape' && activeModal) {
           closeModal();
@@ -121,16 +122,217 @@
     });
 
     // =========================
-    // GSAP ANIMATIONS (when available)
+    // FINSWEET LAZY LOADER + FILTER SCROLL
     // =========================
-    function initGSAP() {
+    (function() {
+      var filters = document.querySelector('[data-filters]');
+      var results = document.querySelector('[data-results]');
+      if (!filters || !results) return;
+
+      var loaded = false;
+      var SCROLL_OFFSET = 16;
+      var observer = null;
+
+      function loadFinsweet() {
+        if (loaded) return;
+        loaded = true;
+
+        var script = document.createElement('script');
+        script.type = 'module';
+        script.src = 'https://cdn.jsdelivr.net/npm/@finsweet/attributes@2/attributes.js';
+        script.setAttribute('fs-list', '');
+        document.body.appendChild(script);
+
+        if (observer) observer.disconnect();
+        window.removeEventListener('scroll', checkScroll);
+      }
+
+      var userTriggered = false;
+
+      filters.addEventListener('click', function(e) {
+        if (e.target.closest('input, select, button, [role="button"], a')) {
+          userTriggered = true;
+          loadFinsweet();
+        }
+      }, true);
+
+      filters.addEventListener('change', function() {
+        userTriggered = true;
+        loadFinsweet();
+      }, true);
+
+      new MutationObserver(function() {
+        if (!userTriggered) return;
+        userTriggered = false;
+        requestAnimationFrame(function() {
+          var target = results.getBoundingClientRect().top + window.scrollY - SCROLL_OFFSET;
+          var maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+          window.scrollTo({ top: Math.min(Math.max(0, target), maxScroll), behavior: 'smooth' });
+        });
+      }).observe(results, { childList: true });
+
+      if ('IntersectionObserver' in window) {
+        observer = new IntersectionObserver(function(entries) {
+          if (entries[0].isIntersecting) loadFinsweet();
+        }, { rootMargin: '300px' });
+        observer.observe(filters);
+      }
+
+      function checkScroll() {
+        var rect = filters.getBoundingClientRect();
+        if (rect.top < window.innerHeight + 500) loadFinsweet();
+      }
+      window.addEventListener('scroll', checkScroll, { passive: true });
+
+      setTimeout(loadFinsweet, 3000);
+    })();
+
+    // =========================
+    // SOCIAL SHARE
+    // =========================
+    (function() {
+      document.querySelectorAll('[data-social-share]').forEach(function(root) {
+        if (root._socialShareBound) return;
+        root._socialShareBound = true;
+
+        var link = root.getAttribute('data-social-share-link') || location.href;
+        var title = root.getAttribute('data-social-share-title') || document.title;
+
+        root.addEventListener('click', function(e) {
+          var btn = e.target.closest('[data-social-share-type]');
+          if (!btn) return;
+          e.preventDefault();
+
+          var type = btn.getAttribute('data-social-share-type');
+          var u = encodeURIComponent(link);
+          var t = encodeURIComponent(title);
+
+          var map = {
+            x: 'https://twitter.com/intent/tweet?text=' + t + '&url=' + u,
+            linkedin: 'https://www.linkedin.com/sharing/share-offsite/?url=' + u,
+            reddit: 'https://www.reddit.com/submit?url=' + u + '&title=' + t,
+            telegram: 'https://t.me/share/url?url=' + u + '&text=' + t,
+            whatsapp: 'https://api.whatsapp.com/send?text=' + t + '%20' + u,
+            mail: 'mailto:?subject=' + t + '&body=' + t + '%0A%0A' + u,
+            facebook: 'https://www.facebook.com/sharer/sharer.php?u=' + u,
+            pinterest: 'https://www.pinterest.com/pin/create/button/?url=' + u + '&description=' + t
+          };
+
+          if (type === 'clipboard') {
+            navigator.clipboard.writeText(link).then(function() {
+              btn.setAttribute('data-social-share-success', '');
+              setTimeout(function() {
+                btn.removeAttribute('data-social-share-success');
+              }, 2000);
+            });
+            return;
+          }
+
+          var url = map[type];
+          if (url) window.open(url, '_blank', 'noopener,noreferrer');
+        });
+      });
+    })();
+
+    // =========================
+    // BACK BUTTON
+    // =========================
+    document.querySelectorAll('[data-back]').forEach(function(el) {
+      el.addEventListener('click', function() {
+        history.back();
+      });
+    });
+
+    // =========================
+    // PROGRESS NAVIGATION
+    // =========================
+    (function() {
+      var navProgress = document.querySelector('[data-progress-nav-list]');
+      if (!navProgress) return;
       if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') {
+        // Wait for GSAP
+        var checkGsap = setInterval(function() {
+          if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+            clearInterval(checkGsap);
+            initProgressNav();
+          }
+        }, 100);
+        setTimeout(function() { clearInterval(checkGsap); }, 5000);
         return;
       }
+      initProgressNav();
+
+      function initProgressNav() {
+        gsap.registerPlugin(ScrollTrigger);
+
+        var indicator = navProgress.querySelector('.progress-nav__indicator');
+        if (!indicator) {
+          indicator = document.createElement('div');
+          indicator.className = 'progress-nav__indicator';
+          navProgress.appendChild(indicator);
+        }
+
+        function updateIndicator(activeLink) {
+          var parentWidth = navProgress.offsetWidth;
+          var parentHeight = navProgress.offsetHeight;
+          var parentRect = navProgress.getBoundingClientRect();
+          var linkRect = activeLink.getBoundingClientRect();
+          
+          var linkPos = {
+            left: linkRect.left - parentRect.left,
+            top: linkRect.top - parentRect.top
+          };
+          
+          var linkWidth = activeLink.offsetWidth;
+          var linkHeight = activeLink.offsetHeight;
+          
+          var leftPercent = (linkPos.left / parentWidth) * 100;
+          var topPercent = (linkPos.top / parentHeight) * 100;
+          var widthPercent = (linkWidth / parentWidth) * 100;
+          var heightPercent = (linkHeight / parentHeight) * 100;
+          
+          indicator.style.left = leftPercent + '%';
+          indicator.style.top = topPercent + '%';
+          indicator.style.width = widthPercent + '%';
+          indicator.style.height = heightPercent + '%';
+        }
+
+        var progressAnchors = gsap.utils.toArray('[data-progress-nav-anchor]');
+
+        progressAnchors.forEach(function(progressAnchor) {
+          var anchorID = progressAnchor.getAttribute('id');
+          
+          ScrollTrigger.create({
+            trigger: progressAnchor,
+            start: '0% 50%',
+            end: '100% 50%',
+            onEnter: function() { activateLink(anchorID); },
+            onEnterBack: function() { activateLink(anchorID); }
+          });
+        });
+
+        function activateLink(anchorID) {
+          var activeLink = navProgress.querySelector('[data-progress-nav-target="#' + anchorID + '"]');
+          if (!activeLink) return;
+          
+          activeLink.classList.add('is--active');
+          var siblings = navProgress.querySelectorAll('[data-progress-nav-target]');
+          siblings.forEach(function(sib) {
+            if (sib !== activeLink) sib.classList.remove('is--active');
+          });
+          updateIndicator(activeLink);
+        }
+      }
+    })();
+
+    // =========================
+    // GSAP ANIMATIONS
+    // =========================
+    function initGSAP() {
+      if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
 
       gsap.registerPlugin(ScrollTrigger);
 
-      // Fade in animations
       gsap.utils.toArray('[data-animate="fadein"]').forEach(function(el) {
         gsap.from(el, {
           opacity: 0,
@@ -145,7 +347,6 @@
         });
       });
 
-      // Reveal list animations
       gsap.utils.toArray('[data-animate="reveal-list"]').forEach(function(container) {
         var items = container.querySelectorAll('.col, .card, .item');
         if (items.length === 0) return;
@@ -164,7 +365,6 @@
         });
       });
 
-      // CSS Scroll retrigger
       gsap.utils.toArray('[data-css-scroll="retrigger-both"]').forEach(function(el) {
         ScrollTrigger.create({
           trigger: el,
@@ -177,59 +377,26 @@
       });
     }
 
-    // Check for GSAP periodically (since it's deferred)
     var gsapCheck = setInterval(function() {
       if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
         clearInterval(gsapCheck);
         initGSAP();
       }
     }, 100);
-
-    // Stop checking after 5 seconds
     setTimeout(function() { clearInterval(gsapCheck); }, 5000);
-
-    // =========================
-    // FILTER SYSTEM
-    // =========================
-    (function() {
-      document.querySelectorAll('[data-filter-group]').forEach(function(group) {
-        var buttons = group.querySelectorAll('[data-filter]');
-        var items = document.querySelectorAll('[data-filter-item]');
-
-        buttons.forEach(function(btn) {
-          btn.addEventListener('click', function() {
-            var filter = btn.getAttribute('data-filter');
-
-            // Update active button
-            buttons.forEach(function(b) { b.classList.remove('is-active'); });
-            btn.classList.add('is-active');
-
-            // Filter items
-            items.forEach(function(item) {
-              var categories = item.getAttribute('data-filter-item').split(',');
-              var show = filter === 'all' || categories.indexOf(filter) !== -1;
-              item.style.display = show ? '' : 'none';
-            });
-          });
-        });
-      });
-    })();
 
     // =========================
     // FORM ENHANCEMENT
     // =========================
-    (function() {
-      // Auto-resize textareas
-      document.querySelectorAll('textarea').forEach(function(textarea) {
-        textarea.addEventListener('input', function() {
-          this.style.height = 'auto';
-          this.style.height = this.scrollHeight + 'px';
-        });
+    document.querySelectorAll('textarea').forEach(function(textarea) {
+      textarea.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = this.scrollHeight + 'px';
       });
-    })();
+    });
 
     // =========================
-    // SMOOTH SCROLL (for anchor links)
+    // SMOOTH SCROLL
     // =========================
     document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {
       anchor.addEventListener('click', function(e) {
