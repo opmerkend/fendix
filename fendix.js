@@ -1,6 +1,6 @@
 /**
  * FENDIX.JS
- * JavaScript for Fendix website */
+ * Correct javaScript for Fendix website */
 
 (function() {
   'use strict';
