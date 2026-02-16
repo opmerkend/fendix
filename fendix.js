@@ -38,13 +38,13 @@
         accordion.querySelectorAll('[data-accordion-toggle]').forEach(function(toggle) {
           toggle.addEventListener('click', function(e) {
             e.preventDefault();
-            var item = toggle.closest('.accordion-css__item');
+            var item = toggle.closest('.accordion-css__item, .home-tabs_item');
             if (!item) return;
 
             var isActive = item.getAttribute('data-accordion-status') === 'active';
 
             if (closeSiblings) {
-              accordion.querySelectorAll('.accordion-css__item').forEach(function(sibling) {
+              accordion.querySelectorAll('.accordion-css__item, .home-tabs_item').forEach(function(sibling) {
                 if (sibling !== item) {
                   sibling.setAttribute('data-accordion-status', 'not-active');
                 }
@@ -332,37 +332,46 @@
       if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
 
       gsap.registerPlugin(ScrollTrigger);
+      
+      // Signal that GSAP is ready (enables CSS hide)
+      document.documentElement.classList.add('gsap-ready');
 
       gsap.utils.toArray('[data-animate="fadein"]').forEach(function(el) {
-        gsap.from(el, {
-          opacity: 0,
-          y: 30,
-          duration: 0.8,
-          ease: 'power2.out',
-          scrollTrigger: {
-            trigger: el,
-            start: 'top 85%',
-            toggleActions: 'play none none none'
+        gsap.fromTo(el, 
+          { opacity: 0, y: 30 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            ease: 'power2.out',
+            scrollTrigger: {
+              trigger: el,
+              start: 'top 85%',
+              toggleActions: 'play none none none'
+            }
           }
-        });
+        );
       });
 
       gsap.utils.toArray('[data-animate="reveal-list"]').forEach(function(container) {
         var items = container.querySelectorAll('.col, .card, .item');
         if (items.length === 0) return;
 
-        gsap.from(items, {
-          opacity: 0,
-          y: 40,
-          duration: 0.6,
-          stagger: 0.1,
-          ease: 'power2.out',
-          scrollTrigger: {
-            trigger: container,
-            start: 'top 80%',
-            toggleActions: 'play none none none'
+        gsap.fromTo(items,
+          { opacity: 0, y: 40 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.6,
+            stagger: 0.1,
+            ease: 'power2.out',
+            scrollTrigger: {
+              trigger: container,
+              start: 'top 80%',
+              toggleActions: 'play none none none'
+            }
           }
-        });
+        );
       });
 
       gsap.utils.toArray('[data-css-scroll="retrigger-both"]').forEach(function(el) {
