@@ -1,6 +1,5 @@
-
+gsap.registerPlugin(ScrollTrigger, Observer);
 <!-- Interactions -->
-<script>
 (function() {
   'use strict';
 
@@ -135,4 +134,3 @@
     init();
   }
 })();
-</script>
