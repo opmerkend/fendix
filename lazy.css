@@ -128,12 +128,8 @@
 }
 
 /* =========================
-   Accordion (extended)
+   Accordion (base styling)
 ========================= */
-[data-accordion-status="active"] .nav-tab_title { 
-  color: var(--swatch--dark-purple); 
-}
-
 .accordion-icon_wrap { 
   color: var(--swatch--dark-purple);
   transition: transform 0.6s cubic-bezier(0.625, 0.05, 0, 1);
@@ -142,19 +138,6 @@
 .accordion-icon_faq,
 .accordion_css_heading {
   transition: transform 0.6s cubic-bezier(0.625, 0.05, 0, 1);
-}
-
-[data-accordion-status="active"] .accordion_css_heading { 
-  color: var(--swatch--dark-purple); 
-}
-
-[data-accordion-status="active"] .accordion-icon_wrap { 
-  background: var(--swatch--dark-secondary); 
-}
-
-[data-accordion-status="active"] .accordion-icon_faq {
-  transform: rotate(0);
-  color: var(--swatch--light);
 }
 
 .accordion-icon_faq { 
@@ -166,31 +149,9 @@
   transition: background 0.4s cubic-bezier(0.625, 0.05, 0, 1);
 }
 
-.accordion-css__item-bottom.is-nav {
-  opacity: 0;
-  visibility: hidden;
-  transition: grid-template-rows 0.6s cubic-bezier(0.625, 0.05, 0, 1),
-              opacity 0.4s cubic-bezier(0.625, 0.05, 0, 1),
-              visibility 0s linear 0.4s;
-}
-
-[data-accordion-status="active"] .accordion-css__item-bottom.is-nav {
-  opacity: 1;
-  visibility: visible;
-  transition: grid-template-rows 0.6s cubic-bezier(0.625, 0.05, 0, 1),
-              opacity 0.4s cubic-bezier(0.625, 0.05, 0, 1),
-              visibility 0s linear 0s;
-}
-
 @media (min-width: 992px) {
   .accordion-css__item-icon.is-nav {
     transform: rotate(-90deg);
-  }
-  [data-accordion-status="active"] .accordion-css__item-icon.is-nav {
-    transform: rotate(-90deg);
-  }
-  [data-accordion-status="active"].accordion-css__item.is-nav .nav-tab {
-    background: linear-gradient(to right, white, var(--swatch--clear-grey-100));
   }
 }
 
@@ -200,18 +161,15 @@
 .nav-tab_icon.default { opacity: 1; }
 .nav-tab_icon.current { opacity: 0; }
 
-.nav-tab.w--current .nav-tab_icon.current,
-[data-accordion-status="active"] .nav-tab_icon.current { 
+.nav-tab.w--current .nav-tab_icon.current { 
   opacity: 1; 
 }
 
-.nav-tab.w--current .nav-tab_icon.default,
-[data-accordion-status="active"] .nav-tab_icon.default { 
+.nav-tab.w--current .nav-tab_icon.default { 
   opacity: 0; 
 }
 
-.nav-tab.w--current .nav-tab_icon_bg,
-[data-accordion-status="active"] .nav-tab_icon_bg {
+.nav-tab.w--current .nav-tab_icon_bg {
   opacity: 0;
   transform: scale(0.1);
 }
@@ -365,13 +323,4 @@
 
 .link-list:hover .button-icon_slot {
   color: var(--swatch--dark-purple);
-}
-
-.modal__dark {
-  backdrop-filter: blur(0rem);
-  transition: backdrop-filter 0.3s ease;
-}
-
-.modal-box[data-modal-status="active"] ~ .modal__dark {
-  backdrop-filter: blur(1rem);
 }
