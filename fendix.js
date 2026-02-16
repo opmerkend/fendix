@@ -1,8 +1,6 @@
 /**
  * FENDIX.JS
- * Final comit for Fendix website - test
- */
-
+ * JavaScript for Fendix website */
 
 (function() {
   'use strict';
@@ -116,9 +114,11 @@
     // FINSWEET LAZY LOADER + FILTER SCROLL
     // =========================
     (function() {
+      var fsList = document.querySelector('[fs-list-element="list"]');
+      if (!fsList) return;
+
       var filters = document.querySelector('[data-filters]');
-      var results = document.querySelector('[data-results]');
-      if (!filters || !results) return;
+      var results = document.querySelector('[data-results]') || fsList;
 
       var loaded = false;
       var SCROLL_OFFSET = 16;
@@ -140,17 +140,19 @@
 
       var userTriggered = false;
 
-      filters.addEventListener('click', function(e) {
-        if (e.target.closest('input, select, button, [role="button"], a')) {
+      if (filters) {
+        filters.addEventListener('click', function(e) {
+          if (e.target.closest('input, select, button, [role="button"], a')) {
+            userTriggered = true;
+            loadFinsweet();
+          }
+        }, true);
+
+        filters.addEventListener('change', function() {
           userTriggered = true;
           loadFinsweet();
-        }
-      }, true);
-
-      filters.addEventListener('change', function() {
-        userTriggered = true;
-        loadFinsweet();
-      }, true);
+        }, true);
+      }
 
       new MutationObserver(function() {
         if (!userTriggered) return;
@@ -162,15 +164,17 @@
         });
       }).observe(results, { childList: true });
 
+      var triggerElement = filters || fsList;
+
       if ('IntersectionObserver' in window) {
         observer = new IntersectionObserver(function(entries) {
           if (entries[0].isIntersecting) loadFinsweet();
         }, { rootMargin: '300px' });
-        observer.observe(filters);
+        observer.observe(triggerElement);
       }
 
       function checkScroll() {
-        var rect = filters.getBoundingClientRect();
+        var rect = triggerElement.getBoundingClientRect();
         if (rect.top < window.innerHeight + 500) loadFinsweet();
       }
       window.addEventListener('scroll', checkScroll, { passive: true });
