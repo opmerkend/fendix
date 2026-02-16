@@ -5,12 +5,8 @@
 
 /* === SWIPER OVERFLOW === */
 .swiper,
-.swiper-wrapper,
-.swiper.is-case,
-.swiper-wrapper.is-case,
-.swiper.is-team,
-.swiper-wrapper.is-team {
-  overflow: visible;
+.swiper-wrapper, {
+  overflow: visible!important;
 }
 
 .value-slider_component,
