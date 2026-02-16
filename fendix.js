@@ -17,71 +17,12 @@
     // =========================
     // NAVBAR STATE
     // =========================
-    (function() {
-      var de = document.documentElement;
-      var nav = document.querySelector('.navbar');
-      if (!nav) return;
-
-      var navBg = nav.querySelector('.navbar_scroll_background');
-      var topBg = document.querySelector('.topbar_background');
-      var overlay = document.querySelector('.nav-overlay');
-      var isDarkStart = nav.getAttribute('start-color') === 'dark';
-      
-      var scrolled = window.scrollY > 0;
-      var uiOpen = false;
-      var ticking = false;
-
-      function update() {
-        var active = scrolled || uiOpen;
-        
-        if (navBg) navBg.classList.toggle('open', active);
-        if (topBg) topBg.classList.toggle('open', active);
-        
-        if (isDarkStart) {
-          var dark = !scrolled && !uiOpen;
-          de.classList.toggle('navbar-top-dark', dark);
-          nav.classList.toggle('is-top-dark', dark);
-        }
-        
-        if (overlay) {
-          var isDesktop = window.innerWidth >= 992;
-          var ddOpen = nav.querySelector('.w-dropdown-toggle.w--open');
-          var menuOpen = nav.querySelector('.w-nav-button.w--open, .navbar_menu-button.w--open');
-          overlay.classList.toggle('open', isDesktop ? !!ddOpen : !!menuOpen);
-        }
-      }
-
-      function onScroll() {
-        scrolled = window.scrollY > 0;
-        if (!ticking) {
-          requestAnimationFrame(function() {
-            update();
-            ticking = false;
-          });
-          ticking = true;
-        }
-      }
-
-      // Observe dropdown/menu changes
-      var observer = new MutationObserver(function() {
-        var ddOpen = nav.querySelector('.w-dropdown-toggle.w--open');
-        var menuOpen = nav.querySelector('.w-nav-button.w--open, .navbar_menu-button.w--open');
-        uiOpen = !!(ddOpen || menuOpen);
-        update();
-      });
-
-      observer.observe(nav, { 
-        subtree: true, 
-        attributes: true, 
-        attributeFilter: ['class'] 
-      });
-
-      window.addEventListener('scroll', onScroll, { passive: true });
-      window.addEventListener('resize', update, { passive: true });
-      
-      // Initial update
-      update();
-    })();
+    // Note: Core navbar logic is in head.html for immediate response
+    // This section intentionally minimal - head script handles:
+    // - Scroll state
+    // - Menu/dropdown observers  
+    // - Dark state toggle
+    // - Overlay toggle
 
     // =========================
     // ACCORDION CSS
