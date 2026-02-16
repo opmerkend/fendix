@@ -30,12 +30,13 @@ gsap.registerPlugin(ScrollTrigger, Observer);
       function update() {
         var active = scrolled || uiOpen;
         
-        de.classList.toggle('is-scrolled', active);
         if (navBg) navBg.classList.toggle('open', active);
         if (topBg) topBg.classList.toggle('open', active);
         
         if (isDarkStart) {
-          de.classList.toggle('navbar-top-dark', !active);
+          var dark = !scrolled && !uiOpen;
+          de.classList.toggle('navbar-top-dark', dark);
+          nav.classList.toggle('is-top-dark', dark);
         }
         
         if (overlay) {
