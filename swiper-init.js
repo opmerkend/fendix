@@ -18,9 +18,15 @@
 (function() {
   'use strict';
 
+  var maxRetries = 100;
+  var retryCount = 0;
+
   function init() {
     if (typeof Swiper === 'undefined') {
-      setTimeout(init, 50);
+      retryCount++;
+      if (retryCount < maxRetries) {
+        setTimeout(init, 50);
+      }
       return;
     }
 
@@ -73,8 +79,6 @@
         centeredSlides: true,
         loopedSlides: slideCount,
         loopAdditionalSlides: slideCount,
-        preloadImages: true,
-        updateOnImagesReady: true,
         autoplay: {
           delay: 3000,
           disableOnInteraction: false,
