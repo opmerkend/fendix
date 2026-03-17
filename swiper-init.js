@@ -48,53 +48,7 @@
       };
     }
 
-  // =========================
-// HERO SLIDER
-// Coverflow effect with autoplay
-// =========================
-document.querySelectorAll('.hero-slider_component').forEach(function(component) {
-  var el = component.querySelector('.swiper');
-  if (!el) return;
-
-  var slideCount = el.querySelectorAll('.swiper-slide').length;
-  var enableLoop = slideCount > 2;
-
-  new Swiper(el, {
-    slidesPerView: 1,
-    effect: 'coverflow',
-    coverflowEffect: {
-      rotate: 5,
-      scale: 0.95,
-      stretch: 0,
-      depth: 0,
-      slideShadows: false
-    },
-    speed: 1000,
-    loop: enableLoop,
-    centeredSlides: true,
-    loopedSlides: enableLoop ? slideCount : 0,
-    loopAdditionalSlides: enableLoop ? slideCount : 0,
-    preloadImages: true,
-    updateOnImagesReady: true,
-    autoplay: slideCount > 1 ? {
-      delay: 3000,
-      disableOnInteraction: false,
-      pauseOnMouseEnter: true
-    } : false,
-    allowTouchMove: true,
-    grabCursor: true,
-    mousewheel: { forceToAxis: true },
-    keyboard: { enabled: true, onlyInViewport: true },
-    breakpoints: {
-      576: {
-        coverflowEffect: {
-          scale: 0.85,
-          slideShadows: false
-        }
-      }
-    }
-  });
-});
+  
     // =========================
     // CASE SLIDER
     // Simple rewind slider
