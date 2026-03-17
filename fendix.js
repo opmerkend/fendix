@@ -315,8 +315,30 @@
       });
     });
 
+    (function() {
+      document.querySelectorAll('img').forEach(function(img) {
+        if (img.hasAttribute('alt') && img.getAttribute('alt') !== '') return;
+
+        var container = img.closest(
+          '.case-card, .main-card, .team-card, .resource-card, figure, [class*="card"], section'
+        );
+
+        if (!container) {
+          img.setAttribute('alt', '');
+          return;
+        }
+
+        var textEl = container.querySelector(
+          '.card-title, h1, h2, h3, h4, h5, h6, [class*="title"], [class*="heading"], figcaption'
+        );
+
+        if (textEl && textEl.textContent.trim()) {
+          img.setAttribute('alt', textEl.textContent.trim());
+        } else {
+          img.setAttribute('alt', '');
+        }
+      });
+    })();
+
   } // end init
 })();
-```
-
----
