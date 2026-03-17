@@ -23,23 +23,17 @@
     (function() {
       document.querySelectorAll('[data-accordion-css-init]').forEach(function(accordion) {
         var closeSiblings = accordion.hasAttribute('data-accordion-close-siblings');
-
         accordion.querySelectorAll('[data-accordion-toggle]').forEach(function(toggle) {
           toggle.addEventListener('click', function(e) {
             e.preventDefault();
             var item = toggle.closest('.accordion-css__item, .home-tabs_item');
             if (!item) return;
-
             var isActive = item.getAttribute('data-accordion-status') === 'active';
-
             if (closeSiblings) {
               accordion.querySelectorAll('.accordion-css__item, .home-tabs_item').forEach(function(sibling) {
-                if (sibling !== item) {
-                  sibling.setAttribute('data-accordion-status', 'not-active');
-                }
+                if (sibling !== item) sibling.setAttribute('data-accordion-status', 'not-active');
               });
             }
-
             item.setAttribute('data-accordion-status', isActive ? 'not-active' : 'active');
           });
         });
@@ -48,19 +42,15 @@
 
     // =========================
     // MODAL SYSTEM
-    // Gebruikt data-modal-open op <html> i.p.v. paddingRight op body
-    // om CLS te voorkomen bij het openen van modals.
     // =========================
     (function() {
       var activeModal = null;
       var scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
-
       document.documentElement.style.setProperty('--scrollbar-width', scrollbarWidth + 'px');
 
       function openModal(name) {
         var wrapper = document.querySelector('[data-modal-name="' + name + '"]');
         if (!wrapper) return;
-
         var group = wrapper.closest('[data-modal-group-status]');
         if (group) {
           group.setAttribute('data-modal-group-status', 'active');
@@ -81,18 +71,12 @@
       document.querySelectorAll('[data-modal-target]').forEach(function(trigger) {
         trigger.addEventListener('click', function(e) {
           var target = trigger.getAttribute('data-modal-target');
-          if (target) {
-            e.preventDefault();
-            openModal(target);
-          }
+          if (target) { e.preventDefault(); openModal(target); }
         });
       });
 
       document.querySelectorAll('[data-modal-close]').forEach(function(closer) {
-        closer.addEventListener('click', function(e) {
-          e.preventDefault();
-          closeModal();
-        });
+        closer.addEventListener('click', function(e) { e.preventDefault(); closeModal(); });
       });
 
       document.addEventListener('keydown', function(e) {
@@ -116,7 +100,6 @@
 
       var filters = document.querySelector('[data-filters]');
       var results = document.querySelector('[data-results]') || fsList;
-
       var loaded = false;
       var SCROLL_OFFSET = 16;
       var observer = null;
@@ -124,13 +107,11 @@
       function loadFinsweet() {
         if (loaded) return;
         loaded = true;
-
         var script = document.createElement('script');
         script.type = 'module';
         script.src = 'https://cdn.jsdelivr.net/npm/@finsweet/attributes@2/attributes.js';
         script.setAttribute('fs-list', '');
         document.body.appendChild(script);
-
         if (observer) observer.disconnect();
         window.removeEventListener('scroll', checkScroll);
       }
@@ -140,15 +121,10 @@
       if (filters) {
         filters.addEventListener('click', function(e) {
           if (e.target.closest('input, select, button, [role="button"], a')) {
-            userTriggered = true;
-            loadFinsweet();
+            userTriggered = true; loadFinsweet();
           }
         }, true);
-
-        filters.addEventListener('change', function() {
-          userTriggered = true;
-          loadFinsweet();
-        }, true);
+        filters.addEventListener('change', function() { userTriggered = true; loadFinsweet(); }, true);
       }
 
       new MutationObserver(function() {
@@ -175,7 +151,6 @@
         if (rect.top < window.innerHeight + 500) loadFinsweet();
       }
       window.addEventListener('scroll', checkScroll, { passive: true });
-
       setTimeout(loadFinsweet, 3000);
     })();
 
@@ -186,7 +161,6 @@
       document.querySelectorAll('[data-social-share]').forEach(function(root) {
         if (root._socialShareBound) return;
         root._socialShareBound = true;
-
         var link = root.getAttribute('data-social-share-link') || location.href;
         var title = root.getAttribute('data-social-share-title') || document.title;
 
@@ -194,11 +168,9 @@
           var btn = e.target.closest('[data-social-share-type]');
           if (!btn) return;
           e.preventDefault();
-
           var type = btn.getAttribute('data-social-share-type');
           var u = encodeURIComponent(link);
           var t = encodeURIComponent(title);
-
           var map = {
             x: 'https://twitter.com/intent/tweet?text=' + t + '&url=' + u,
             linkedin: 'https://www.linkedin.com/sharing/share-offsite/?url=' + u,
@@ -209,17 +181,13 @@
             facebook: 'https://www.facebook.com/sharer/sharer.php?u=' + u,
             pinterest: 'https://www.pinterest.com/pin/create/button/?url=' + u + '&description=' + t
           };
-
           if (type === 'clipboard') {
             navigator.clipboard.writeText(link).then(function() {
               btn.setAttribute('data-social-share-success', '');
-              setTimeout(function() {
-                btn.removeAttribute('data-social-share-success');
-              }, 2000);
+              setTimeout(function() { btn.removeAttribute('data-social-share-success'); }, 2000);
             });
             return;
           }
-
           var url = map[type];
           if (url) window.open(url, '_blank', 'noopener,noreferrer');
         });
@@ -230,9 +198,7 @@
     // BACK BUTTON
     // =========================
     document.querySelectorAll('[data-back]').forEach(function(el) {
-      el.addEventListener('click', function() {
-        history.back();
-      });
+      el.addEventListener('click', function() { history.back(); });
     });
 
     // =========================
@@ -255,7 +221,6 @@
 
       function initProgressNav() {
         gsap.registerPlugin(ScrollTrigger);
-
         var indicator = navProgress.querySelector('.progress-nav__indicator');
         if (!indicator) {
           indicator = document.createElement('div');
@@ -268,33 +233,17 @@
           var parentHeight = navProgress.offsetHeight;
           var parentRect = navProgress.getBoundingClientRect();
           var linkRect = activeLink.getBoundingClientRect();
-
-          var linkPos = {
-            left: linkRect.left - parentRect.left,
-            top: linkRect.top - parentRect.top
-          };
-
-          var linkWidth = activeLink.offsetWidth;
-          var linkHeight = activeLink.offsetHeight;
-
-          var leftPercent = (linkPos.left / parentWidth) * 100;
-          var topPercent = (linkPos.top / parentHeight) * 100;
-          var widthPercent = (linkWidth / parentWidth) * 100;
-          var heightPercent = (linkHeight / parentHeight) * 100;
-
-          indicator.style.left = leftPercent + '%';
-          indicator.style.top = topPercent + '%';
-          indicator.style.width = widthPercent + '%';
-          indicator.style.height = heightPercent + '%';
+          var linkPos = { left: linkRect.left - parentRect.left, top: linkRect.top - parentRect.top };
+          indicator.style.left = (linkPos.left / parentWidth) * 100 + '%';
+          indicator.style.top = (linkPos.top / parentHeight) * 100 + '%';
+          indicator.style.width = (activeLink.offsetWidth / parentWidth) * 100 + '%';
+          indicator.style.height = (activeLink.offsetHeight / parentHeight) * 100 + '%';
         }
 
-        var progressAnchors = gsap.utils.toArray('[data-progress-nav-anchor]');
-
-        progressAnchors.forEach(function(progressAnchor) {
-          var anchorID = progressAnchor.getAttribute('id');
-
+        gsap.utils.toArray('[data-progress-nav-anchor]').forEach(function(anchor) {
+          var anchorID = anchor.getAttribute('id');
           ScrollTrigger.create({
-            trigger: progressAnchor,
+            trigger: anchor,
             start: '0% 50%',
             end: '100% 50%',
             onEnter: function() { activateLink(anchorID); },
@@ -305,10 +254,8 @@
         function activateLink(anchorID) {
           var activeLink = navProgress.querySelector('[data-progress-nav-target="#' + anchorID + '"]');
           if (!activeLink) return;
-
           activeLink.classList.add('is--active');
-          var siblings = navProgress.querySelectorAll('[data-progress-nav-target]');
-          siblings.forEach(function(sib) {
+          navProgress.querySelectorAll('[data-progress-nav-target]').forEach(function(sib) {
             if (sib !== activeLink) sib.classList.remove('is--active');
           });
           updateIndicator(activeLink);
@@ -318,8 +265,6 @@
 
     // =========================
     // CSS ANIMATIONS (data-animate)
-    // will-change wordt alleen geactiveerd vlak voor animatie,
-    // niet bij page load voor alle elementen tegelijk.
     // =========================
     (function() {
       var elements = document.querySelectorAll('[data-animate]');
@@ -327,9 +272,7 @@
 
       var preObserver = new IntersectionObserver(function(entries) {
         entries.forEach(function(entry) {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('will-animate');
-          }
+          if (entry.isIntersecting) entry.target.classList.add('will-animate');
         });
       }, { rootMargin: '200px' });
 
@@ -342,10 +285,7 @@
             entry.target.classList.remove('will-animate');
           }
         });
-      }, {
-        threshold: 0.1,
-        rootMargin: '0px 0px -10% 0px'
-      });
+      }, { threshold: 0.1, rootMargin: '0px 0px -10% 0px' });
 
       elements.forEach(function(el) {
         preObserver.observe(el);
@@ -370,48 +310,13 @@
       anchor.addEventListener('click', function(e) {
         var targetId = this.getAttribute('href');
         if (targetId === '#' || targetId === '#main') return;
-
         var target = document.querySelector(targetId);
-        if (target) {
-          e.preventDefault();
-          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
+        if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
       });
     });
 
-    // =========================
-    // IMAGE OPTIMISATION
-    // Alleen non-hero afbeeldingen — hero wordt in head afgehandeld.
-    // =========================
-    (function() {
-      var CDN = 'cdn.prod.website-files.com';
-      var WIDTHS = [400, 800, 1200, 1600];
-      var QUALITY = 80;
-      var heroImg = document.querySelector('section img, header img');
-
-      document.querySelectorAll('img').forEach(function(img) {
-        if (img === heroImg) return;
-        var src = img.getAttribute('src') || '';
-        if (!src || src.indexOf(CDN) === -1) return;
-        var base = src.split('?')[0];
-
-        img.setAttribute('srcset', WIDTHS.map(function(w) {
-          return base + '?w=' + w + '&q=' + QUALITY + ' ' + w + 'w';
-        }).join(', '));
-
-        img.setAttribute('sizes', [
-          '(max-width: 479px) 100vw',
-          '(max-width: 767px) 100vw',
-          '(max-width: 991px) 100vw',
-          '(max-width: 1280px) 80vw',
-          '1200px'
-        ].join(', '));
-
-        img.setAttribute('src', base + '?w=1200&q=' + QUALITY);
-        if (!img.hasAttribute('loading')) img.setAttribute('loading', 'lazy');
-        img.setAttribute('decoding', 'async');
-      });
-    })();
-
   } // end init
 })();
+```
+
+---
