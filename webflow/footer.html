@@ -11,9 +11,18 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/opmerkend/fendix@main/animate.css" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/opmerkend/fendix@main/animate.css"></noscript>
 
-<!-- Swiper CSS (lazy) -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" media="print" onload="this.media='all'">
-<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"></noscript>
+<!-- Swiper CSS + JS (only when sliders exist on the page) -->
+<script>
+if(document.querySelector('.swiper')){
+  var c=document.createElement('link');c.rel='stylesheet';c.href='https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css';c.media='print';c.onload=function(){c.media='all'};document.head.appendChild(c);
+  var s=document.createElement('script');s.defer=true;s.src='https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js';
+  s.onload=function(){var i=document.createElement('script');i.defer=true;i.src='https://cdn.jsdelivr.net/gh/opmerkend/fendix@main/swiper-init.js';document.body.appendChild(i);};
+  document.body.appendChild(s);
+}
+</script>
+<noscript>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+</noscript>
 
 <!-- Finsweet Scrolldisable -->
 <script defer src="https://cdn.jsdelivr.net/npm/@finsweet/attributes-scrolldisable@1/scrolldisable.js"></script>

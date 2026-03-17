@@ -1,7 +1,7 @@
 /**
  * SWIPER-INIT.JS
  * All Swiper slider configurations for Fendix
- * 
+ *
  * Sliders:
  * - Hero slider (coverflow + autoplay)
  * - Case slider (rewind)
@@ -9,51 +9,75 @@
  * - Partner slider (active class + rewind)
  * - Value slider (responsive breakpoints)
  * - Steps slider (active class + rewind)
- * 
- * Usage:
- * <script defer src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
- * <script defer src="https://cdn.jsdelivr.net/gh/opmerkend/fendix@main/swiper-init.js"></script>
+ *
+ * Loaded conditionally via footer.html — only when .swiper exists on the page.
  */
 
 (function() {
   'use strict';
 
-  var maxRetries = 100;
-  var retryCount = 0;
-
-  function init() {
-    if (typeof Swiper === 'undefined') {
-      retryCount++;
-      if (retryCount < maxRetries) {
-        setTimeout(init, 50);
-      }
-      return;
+  // Helper: Set active class on current slide
+  function createActiveClassHandler(swiper) {
+    swiper.slides.forEach(function(s) { s.classList.remove('is-active'); });
+    if (swiper.slides[swiper.activeIndex]) {
+      swiper.slides[swiper.activeIndex].classList.add('is-active');
     }
+  }
 
-    // Helper: Set active class on current slide
-    function createActiveClassHandler(swiper) {
-      swiper.slides.forEach(function(s) { s.classList.remove('is-active'); });
-      if (swiper.slides[swiper.activeIndex]) {
-        swiper.slides[swiper.activeIndex].classList.add('is-active');
+  // Helper: Standard navigation + scrollbar config
+  function getNavConfig(component) {
+    return {
+      navigation: {
+        nextEl: component.querySelector('.swiper-button.is-next'),
+        prevEl: component.querySelector('.swiper-button.is-prev')
+      },
+      scrollbar: {
+        el: component.querySelector('.swiper-scrollbar_wrap'),
+        draggable: true,
+        dragClass: 'swiper-scrollbar_handle',
+        snapOnRelease: true
       }
-    }
+    };
+  }
 
-    // Helper: Standard navigation + scrollbar config
-    function getNavConfig(component) {
-      return {
-        navigation: {
-          nextEl: component.querySelector('.swiper-button.is-next'),
-          prevEl: component.querySelector('.swiper-button.is-prev')
-        },
-        scrollbar: {
-          el: component.querySelector('.swiper-scrollbar_wrap'),
-          draggable: true,
-          dragClass: 'swiper-scrollbar_handle',
-          snapOnRelease: true
+  // Helper: Active-class slider factory (used by Team, Partner, Steps)
+  function initActiveClassSlider(selector, extraConfig) {
+    document.querySelectorAll(selector).forEach(function(component) {
+      var el = component.querySelector('.swiper');
+      if (!el) return;
+
+      var nav = getNavConfig(component);
+
+      var config = {
+        slidesPerView: 'auto',
+        speed: 450,
+        mousewheel: { forceToAxis: true },
+        keyboard: { enabled: true, onlyInViewport: true },
+        navigation: nav.navigation,
+        scrollbar: nav.scrollbar,
+        on: {
+          init: function(sw) { createActiveClassHandler(sw); },
+          slideChange: function(sw) { createActiveClassHandler(sw); },
+          resize: function(sw) { createActiveClassHandler(sw); },
+          afterInit: function(sw) {
+            sw.update();
+            createActiveClassHandler(sw);
+          }
         }
       };
-    }
 
+      // Merge extra config (e.g. rewind, watchSlidesProgress)
+      for (var key in extraConfig) {
+        if (extraConfig.hasOwnProperty(key)) {
+          config[key] = extraConfig[key];
+        }
+      }
+
+      new Swiper(el, config);
+    });
+  }
+
+  function init() {
     // =========================
     // HERO SLIDER
     // Coverflow effect with autoplay
@@ -122,67 +146,21 @@
 
     // =========================
     // TEAM SLIDER
-    // Active class on current slide, no loop
+    // Active class on current slide, no loop/rewind
     // =========================
-    document.querySelectorAll('.team-slider_component').forEach(function(component) {
-      var el = component.querySelector('.swiper');
-      if (!el) return;
-
-      var nav = getNavConfig(component);
-
-      var swiper = new Swiper(el, {
-        speed: 450,
-        watchSlidesProgress: true,
-        loop: false,
-        rewind: false,
-        centeredSlides: false,
-        slidesPerView: 'auto',
-        mousewheel: { forceToAxis: true },
-        keyboard: { enabled: true, onlyInViewport: true },
-        navigation: nav.navigation,
-        scrollbar: nav.scrollbar,
-        on: {
-          init: function(sw) { createActiveClassHandler(sw); },
-          slideChange: function(sw) { createActiveClassHandler(sw); },
-          resize: function(sw) { createActiveClassHandler(sw); }
-        }
-      });
-
-      setTimeout(function() {
-        swiper.update();
-        createActiveClassHandler(swiper);
-      }, 150);
+    initActiveClassSlider('.team-slider_component', {
+      watchSlidesProgress: true,
+      loop: false,
+      rewind: false,
+      centeredSlides: false
     });
 
     // =========================
     // PARTNER SLIDER
     // Active class + rewind
     // =========================
-    document.querySelectorAll('.partner-slider_component').forEach(function(component) {
-      var el = component.querySelector('.swiper');
-      if (!el) return;
-
-      var nav = getNavConfig(component);
-
-      var swiper = new Swiper(el, {
-        slidesPerView: 'auto',
-        speed: 450,
-        rewind: true,
-        mousewheel: { forceToAxis: true },
-        keyboard: { enabled: true, onlyInViewport: true },
-        navigation: nav.navigation,
-        scrollbar: nav.scrollbar,
-        on: {
-          init: function(sw) { createActiveClassHandler(sw); },
-          slideChange: function(sw) { createActiveClassHandler(sw); },
-          resize: function(sw) { createActiveClassHandler(sw); }
-        }
-      });
-
-      setTimeout(function() {
-        swiper.update();
-        createActiveClassHandler(swiper);
-      }, 150);
+    initActiveClassSlider('.partner-slider_component', {
+      rewind: true
     });
 
     // =========================
@@ -227,33 +205,10 @@
 
     // =========================
     // STEPS SLIDER
-    // Active class + rewind (same as partner)
+    // Active class + rewind (same pattern as partner)
     // =========================
-    document.querySelectorAll('.steps-slider_component').forEach(function(component) {
-      var el = component.querySelector('.swiper');
-      if (!el) return;
-
-      var nav = getNavConfig(component);
-
-      var swiper = new Swiper(el, {
-        slidesPerView: 'auto',
-        speed: 450,
-        rewind: true,
-        mousewheel: { forceToAxis: true },
-        keyboard: { enabled: true, onlyInViewport: true },
-        navigation: nav.navigation,
-        scrollbar: nav.scrollbar,
-        on: {
-          init: function(sw) { createActiveClassHandler(sw); },
-          slideChange: function(sw) { createActiveClassHandler(sw); },
-          resize: function(sw) { createActiveClassHandler(sw); }
-        }
-      });
-
-      setTimeout(function() {
-        swiper.update();
-        createActiveClassHandler(swiper);
-      }, 150);
+    initActiveClassSlider('.steps-slider_component', {
+      rewind: true
     });
 
   } // end init
