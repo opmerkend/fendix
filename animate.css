@@ -16,7 +16,7 @@ Final commit - animate
 /* =========================
    BASE - ALL ANIMATIONS
    ========================= */
-[data-animate] {
+[data-animate].will-animate {
   will-change: opacity, transform;
 }
 
