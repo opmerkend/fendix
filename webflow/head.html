@@ -103,16 +103,15 @@
   color: #fff;
 }
 
-/* === DARK STATE: Text (topbar — outside navbar) ===
-   Uses :root:has() with nested :has(). Modern browsers (2024+) support this. */
-:root:has(.navbar[start-color="dark"]:not([data-scrolled]):not(:has(.w--open))) :is(
+/* === DARK STATE: Topbar (outside navbar) ===
+   Driven by [data-nav-dark] on <html>, set via JS to avoid nested :has() */
+[data-nav-dark] :is(
   .topbar-link,
   .topbar-locale_link) {
   color: #fff;
 }
 
-/* === DARK STATE: Topbar gradient === */
-:root:has(.navbar[start-color="dark"]:not([data-scrolled]):not(:has(.w--open))) .topbar {
+[data-nav-dark] .topbar {
   background-image: linear-gradient(180deg, rgba(0,0,0,0.25), rgba(0,0,0,0));
 }
 
@@ -426,13 +425,25 @@ li::marker { font-weight: bold; }
 <!-- Theme Color -->
 <meta name="theme-color" content="#200433">
 
-<!-- Navbar Scroll Detection -->
+<!-- Navbar: Scroll Detection + Topbar Dark Bridge -->
 <script>
 (function(){
   var nav, ticking = false;
-  function update() {
-    if (nav) nav.toggleAttribute('data-scrolled', window.scrollY > 0);
+
+  function updateDark() {
+    if (!nav) return;
+    var dark = nav.getAttribute('start-color') === 'dark'
+      && !nav.hasAttribute('data-scrolled')
+      && !nav.querySelector('.w--open');
+    document.documentElement.toggleAttribute('data-nav-dark', dark);
   }
+
+  function update() {
+    if (!nav) return;
+    nav.toggleAttribute('data-scrolled', window.scrollY > 0);
+    updateDark();
+  }
+
   function init() {
     nav = document.querySelector('.navbar');
     if (!nav) return;
@@ -449,7 +460,12 @@ li::marker { font-weight: bold; }
         });
       });
     }
+    updateDark();
+    new MutationObserver(updateDark).observe(nav, {
+      subtree: true, attributes: true, attributeFilter: ['class']
+    });
   }
+
   window.addEventListener('scroll', function() {
     if (!ticking) {
       requestAnimationFrame(function() { update(); ticking = false; });
