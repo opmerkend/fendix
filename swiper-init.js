@@ -1,217 +1,196 @@
 /**
  * SWIPER-INIT.JS
  * All Swiper slider configurations for Fendix
- * 
- * Sliders:
- * - Hero slider (coverflow + autoplay)
- * - Case slider (rewind)
- * - Team slider (active class)
- * - Partner slider (active class + rewind)
- * - Value slider (responsive breakpoints)
- * - Steps slider (active class + rewind)
- * 
- * Usage:
- * <script defer src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
- * <script defer src="https://cdn.jsdelivr.net/gh/opmerkend/fendix@main/swiper-init.js"></script>
  */
-
-(function() {
+(function () {
   'use strict';
 
-  function init() {
-    if (typeof Swiper === 'undefined') {
-      setTimeout(init, 50);
-      return;
-    }
+  var MAX_WAIT_MS = 4000;
+  var START = Date.now();
 
-    // Helper: Set active class on current slide
-    function createActiveClassHandler(swiper) {
-      swiper.slides.forEach(function(s) { s.classList.remove('is-active'); });
-      if (swiper.slides[swiper.activeIndex]) {
-        swiper.slides[swiper.activeIndex].classList.add('is-active');
-      }
-    }
+  function whenSwiperReady(cb) {
+    if (typeof Swiper !== 'undefined') return cb();
 
-    // Helper: Standard navigation + scrollbar config
-    function getNavConfig(component) {
-      return {
-        navigation: {
-          nextEl: component.querySelector('.swiper-button.is-next'),
-          prevEl: component.querySelector('.swiper-button.is-prev')
-        },
-        scrollbar: {
-          el: component.querySelector('.swiper-scrollbar_wrap'),
-          draggable: true,
-          dragClass: 'swiper-scrollbar_handle',
-          snapOnRelease: true
-        }
+    if (Date.now() - START > MAX_WAIT_MS) return; // fail silently (or console.warn)
+    setTimeout(function () {
+      whenSwiperReady(cb);
+    }, 50);
+  }
+
+  // Helper: Standard navigation + scrollbar config (only include if elements exist)
+  function getNavConfig(component) {
+    var next = component.querySelector('.swiper-button.is-next');
+    var prev = component.querySelector('.swiper-button.is-prev');
+    var sbWrap = component.querySelector('.swiper-scrollbar_wrap');
+
+    var cfg = {};
+    if (next && prev) {
+      cfg.navigation = { nextEl: next, prevEl: prev };
+    }
+    if (sbWrap) {
+      cfg.scrollbar = {
+        el: sbWrap,
+        draggable: true,
+        dragClass: 'swiper-scrollbar_handle',
+        snapOnRelease: true
       };
     }
+    return cfg;
+  }
 
-  
-    // =========================
-    // CASE SLIDER
-    // Simple rewind slider
-    // =========================
-    document.querySelectorAll('.case-slider_component').forEach(function(component) {
-      var el = component.querySelector('.swiper');
-      if (!el) return;
+  // Helper: Active class handler (O(1))
+  function attachActiveClass(swiper) {
+    var last = null;
 
-      var nav = getNavConfig(component);
+    function setActive() {
+      var current = swiper.slides && swiper.slides[swiper.activeIndex];
+      if (last && last !== current) last.classList.remove('is-active');
+      if (current) current.classList.add('is-active');
+      last = current || null;
+    }
 
-      new Swiper(el, {
-        slidesPerView: 'auto',
-        speed: 450,
-        rewind: true,
-        mousewheel: { forceToAxis: true },
-        keyboard: { enabled: true, onlyInViewport: true },
-        navigation: nav.navigation,
-        scrollbar: nav.scrollbar
-      });
+    swiper.on('init', setActive);
+    swiper.on('slideChange', setActive);
+    swiper.on('resize', setActive);
+
+    // If Swiper is already initialized before handlers attach
+    setActive();
+
+    // One extra update after layout settles (no magic 150ms)
+    requestAnimationFrame(function () {
+      swiper.update();
+      setActive();
     });
 
-    // =========================
-    // TEAM SLIDER
-    // Active class on current slide, no loop
-    // =========================
-    document.querySelectorAll('.team-slider_component').forEach(function(component) {
-      var el = component.querySelector('.swiper');
-      if (!el) return;
-
-      var nav = getNavConfig(component);
-
-      var swiper = new Swiper(el, {
-        speed: 450,
-        watchSlidesProgress: true,
-        loop: false,
-        rewind: false,
-        centeredSlides: false,
-        slidesPerView: 'auto',
-        mousewheel: { forceToAxis: true },
-        keyboard: { enabled: true, onlyInViewport: true },
-        navigation: nav.navigation,
-        scrollbar: nav.scrollbar,
-        on: {
-          init: function(sw) { createActiveClassHandler(sw); },
-          slideChange: function(sw) { createActiveClassHandler(sw); },
-          resize: function(sw) { createActiveClassHandler(sw); }
-        }
-      });
-
-      setTimeout(function() {
+    // Update once after full load (handles late-loading images/font swaps)
+    window.addEventListener(
+      'load',
+      function () {
         swiper.update();
-        createActiveClassHandler(swiper);
-      }, 150);
-    });
+        setActive();
+      },
+      { once: true, passive: true }
+    );
+  }
 
-    // =========================
-    // PARTNER SLIDER
-    // Active class + rewind
-    // =========================
-    document.querySelectorAll('.partner-slider_component').forEach(function(component) {
+  function createSlider(componentSelector, optionsFactory) {
+    document.querySelectorAll(componentSelector).forEach(function (component) {
       var el = component.querySelector('.swiper');
       if (!el) return;
 
       var nav = getNavConfig(component);
+      var opts = optionsFactory(component, nav);
 
-      var swiper = new Swiper(el, {
-        slidesPerView: 'auto',
-        speed: 450,
-        rewind: true,
-        mousewheel: { forceToAxis: true },
-        keyboard: { enabled: true, onlyInViewport: true },
-        navigation: nav.navigation,
-        scrollbar: nav.scrollbar,
-        on: {
-          init: function(sw) { createActiveClassHandler(sw); },
-          slideChange: function(sw) { createActiveClassHandler(sw); },
-          resize: function(sw) { createActiveClassHandler(sw); }
-        }
-      });
+      var swiper = new Swiper(el, opts);
+      if (opts && opts._activeClass) attachActiveClass(swiper);
+    });
+  }
 
-      setTimeout(function() {
-        swiper.update();
-        createActiveClassHandler(swiper);
-      }, 150);
+  function init() {
+    // =========================
+    // CASE SLIDER (rewind)
+    // =========================
+    createSlider('.case-slider_component', function (_component, nav) {
+      return Object.assign(
+        {
+          slidesPerView: 'auto',
+          speed: 450,
+          rewind: true,
+          mousewheel: { forceToAxis: true },
+          keyboard: { enabled: true, onlyInViewport: true }
+        },
+        nav
+      );
     });
 
     // =========================
-    // VALUE SLIDER
-    // Responsive breakpoints
+    // TEAM SLIDER (active class, no rewind/loop)
     // =========================
-    document.querySelectorAll('.value-slider_component').forEach(function(component) {
-      var el = component.querySelector('.swiper');
-      if (!el) return;
+    createSlider('.team-slider_component', function (_component, nav) {
+      return Object.assign(
+        {
+          _activeClass: true,
+          speed: 450,
+          watchSlidesProgress: true,
+          loop: false,
+          rewind: false,
+          centeredSlides: false,
+          slidesPerView: 'auto',
+          mousewheel: { forceToAxis: true },
+          keyboard: { enabled: true, onlyInViewport: true }
+        },
+        nav
+      );
+    });
 
-      var nav = getNavConfig(component);
+    // =========================
+    // PARTNER SLIDER (active class + rewind)
+    // =========================
+    createSlider('.partner-slider_component', function (_component, nav) {
+      return Object.assign(
+        {
+          _activeClass: true,
+          slidesPerView: 'auto',
+          speed: 450,
+          rewind: true,
+          mousewheel: { forceToAxis: true },
+          keyboard: { enabled: true, onlyInViewport: true }
+        },
+        nav
+      );
+    });
 
-      new Swiper(el, {
-        speed: 450,
-        rewind: false,
-        slidesPerView: 1,
-        slidesPerGroup: 1,
-        spaceBetween: 16,
-        mousewheel: { forceToAxis: true },
-        keyboard: { enabled: true, onlyInViewport: true },
-        navigation: nav.navigation,
-        scrollbar: nav.scrollbar,
-        breakpoints: {
-          480: {
-            slidesPerView: 1.5,
-            slidesPerGroup: 1,
-            spaceBetween: 16
-          },
-          768: {
-            slidesPerView: 1.5,
-            slidesPerGroup: 1,
-            spaceBetween: 24
-          },
-          992: {
-            slidesPerView: 2,
-            slidesPerGroup: 1,
-            spaceBetween: 24
+    // =========================
+    // VALUE SLIDER (breakpoints)
+    // =========================
+    createSlider('.value-slider_component', function (_component, nav) {
+      return Object.assign(
+        {
+          speed: 450,
+          rewind: false,
+          slidesPerView: 1,
+          slidesPerGroup: 1,
+          spaceBetween: 16,
+          mousewheel: { forceToAxis: true },
+          keyboard: { enabled: true, onlyInViewport: true },
+          breakpoints: {
+            480: { slidesPerView: 1.5, slidesPerGroup: 1, spaceBetween: 16 },
+            768: { slidesPerView: 1.5, slidesPerGroup: 1, spaceBetween: 24 },
+            992: { slidesPerView: 2, slidesPerGroup: 1, spaceBetween: 24 }
           }
-        }
-      });
+        },
+        nav
+      );
     });
 
     // =========================
-    // STEPS SLIDER
-    // Active class + rewind (same as partner)
+    // STEPS SLIDER (active class + rewind)
     // =========================
-    document.querySelectorAll('.steps-slider_component').forEach(function(component) {
-      var el = component.querySelector('.swiper');
-      if (!el) return;
-
-      var nav = getNavConfig(component);
-
-      var swiper = new Swiper(el, {
-        slidesPerView: 'auto',
-        speed: 450,
-        rewind: true,
-        mousewheel: { forceToAxis: true },
-        keyboard: { enabled: true, onlyInViewport: true },
-        navigation: nav.navigation,
-        scrollbar: nav.scrollbar,
-        on: {
-          init: function(sw) { createActiveClassHandler(sw); },
-          slideChange: function(sw) { createActiveClassHandler(sw); },
-          resize: function(sw) { createActiveClassHandler(sw); }
-        }
-      });
-
-      setTimeout(function() {
-        swiper.update();
-        createActiveClassHandler(swiper);
-      }, 150);
+    createSlider('.steps-slider_component', function (_component, nav) {
+      return Object.assign(
+        {
+          _activeClass: true,
+          slidesPerView: 'auto',
+          speed: 450,
+          rewind: true,
+          mousewheel: { forceToAxis: true },
+          keyboard: { enabled: true, onlyInViewport: true }
+        },
+        nav
+      );
     });
+  }
 
-  } // end init
-
-  // Start when DOM ready
+  // Start when DOM ready and Swiper is actually available
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
+    document.addEventListener(
+      'DOMContentLoaded',
+      function () {
+        whenSwiperReady(init);
+      },
+      { once: true }
+    );
   } else {
-    init();
+    whenSwiperReady(init);
   }
 })();
