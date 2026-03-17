@@ -318,17 +318,28 @@
 
     // =========================
     // CSS ANIMATIONS (data-animate)
+    // will-change wordt alleen geactiveerd vlak voor animatie,
+    // niet bij page load voor alle elementen tegelijk.
     // =========================
     (function() {
       var elements = document.querySelectorAll('[data-animate]');
       if (!elements.length) return;
 
-      var observer = new IntersectionObserver(function(entries) {
+      var preObserver = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('will-animate');
+          }
+        });
+      }, { rootMargin: '200px' });
+
+      var inviewObserver = new IntersectionObserver(function(entries) {
         entries.forEach(function(entry) {
           if (entry.isIntersecting) {
             entry.target.classList.add('is-inview');
           } else {
             entry.target.classList.remove('is-inview');
+            entry.target.classList.remove('will-animate');
           }
         });
       }, {
@@ -337,7 +348,8 @@
       });
 
       elements.forEach(function(el) {
-        observer.observe(el);
+        preObserver.observe(el);
+        inviewObserver.observe(el);
       });
     })();
 
