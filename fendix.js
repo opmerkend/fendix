@@ -52,6 +52,15 @@
       var activeModal = null;
       var lastFocus = null;
 
+      // ✅ FIX: force all modals closed on page load
+      document.documentElement.removeAttribute('data-modal-open');
+      document.querySelectorAll('[data-modal-group-status]').forEach(function (g) {
+        g.setAttribute('data-modal-group-status', 'non-active');
+      });
+      document.querySelectorAll('[data-modal-status]').forEach(function (m) {
+        m.setAttribute('data-modal-status', 'non-active');
+      });
+
       function setScrollbarWidthVar() {
         var w = window.innerWidth - document.documentElement.clientWidth;
         document.documentElement.style.setProperty('--scrollbar-width', w + 'px');
