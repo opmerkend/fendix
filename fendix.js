@@ -48,10 +48,14 @@
 
     // =========================
     // MODAL SYSTEM
+    // Gebruikt data-modal-open op <html> i.p.v. paddingRight op body
+    // om CLS te voorkomen bij het openen van modals.
     // =========================
     (function() {
       var activeModal = null;
       var scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+
+      document.documentElement.style.setProperty('--scrollbar-width', scrollbarWidth + 'px');
 
       function openModal(name) {
         var wrapper = document.querySelector('[data-modal-name="' + name + '"]');
@@ -62,21 +66,16 @@
           group.setAttribute('data-modal-group-status', 'active');
           wrapper.setAttribute('data-modal-status', 'active');
           activeModal = { group: group, wrapper: wrapper };
-          
-          document.body.style.overflow = 'hidden';
-          document.body.style.paddingRight = scrollbarWidth + 'px';
+          document.documentElement.setAttribute('data-modal-open', '');
         }
       }
 
       function closeModal() {
         if (!activeModal) return;
-
         activeModal.group.setAttribute('data-modal-group-status', 'non-active');
         activeModal.wrapper.setAttribute('data-modal-status', 'non-active');
         activeModal = null;
-        
-        document.body.style.overflow = '';
-        document.body.style.paddingRight = '';
+        document.documentElement.removeAttribute('data-modal-open');
       }
 
       document.querySelectorAll('[data-modal-target]').forEach(function(trigger) {
@@ -97,9 +96,7 @@
       });
 
       document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && activeModal) {
-          closeModal();
-        }
+        if (e.key === 'Escape' && activeModal) closeModal();
       });
     })();
 
@@ -160,270 +157,4 @@
         requestAnimationFrame(function() {
           var target = results.getBoundingClientRect().top + window.scrollY - SCROLL_OFFSET;
           var maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-          window.scrollTo({ top: Math.min(Math.max(0, target), maxScroll), behavior: 'smooth' });
-        });
-      }).observe(results, { childList: true });
-
-      var triggerElement = filters || fsList;
-
-      if ('IntersectionObserver' in window) {
-        observer = new IntersectionObserver(function(entries) {
-          if (entries[0].isIntersecting) loadFinsweet();
-        }, { rootMargin: '300px' });
-        observer.observe(triggerElement);
-      }
-
-      function checkScroll() {
-        var rect = triggerElement.getBoundingClientRect();
-        if (rect.top < window.innerHeight + 500) loadFinsweet();
-      }
-      window.addEventListener('scroll', checkScroll, { passive: true });
-
-      setTimeout(loadFinsweet, 3000);
-    })();
-
-    // =========================
-    // SOCIAL SHARE
-    // =========================
-    (function() {
-      document.querySelectorAll('[data-social-share]').forEach(function(root) {
-        if (root._socialShareBound) return;
-        root._socialShareBound = true;
-
-        var link = root.getAttribute('data-social-share-link') || location.href;
-        var title = root.getAttribute('data-social-share-title') || document.title;
-
-        root.addEventListener('click', function(e) {
-          var btn = e.target.closest('[data-social-share-type]');
-          if (!btn) return;
-          e.preventDefault();
-
-          var type = btn.getAttribute('data-social-share-type');
-          var u = encodeURIComponent(link);
-          var t = encodeURIComponent(title);
-
-          var map = {
-            x: 'https://twitter.com/intent/tweet?text=' + t + '&url=' + u,
-            linkedin: 'https://www.linkedin.com/sharing/share-offsite/?url=' + u,
-            reddit: 'https://www.reddit.com/submit?url=' + u + '&title=' + t,
-            telegram: 'https://t.me/share/url?url=' + u + '&text=' + t,
-            whatsapp: 'https://api.whatsapp.com/send?text=' + t + '%20' + u,
-            mail: 'mailto:?subject=' + t + '&body=' + t + '%0A%0A' + u,
-            facebook: 'https://www.facebook.com/sharer/sharer.php?u=' + u,
-            pinterest: 'https://www.pinterest.com/pin/create/button/?url=' + u + '&description=' + t
-          };
-
-          if (type === 'clipboard') {
-            navigator.clipboard.writeText(link).then(function() {
-              btn.setAttribute('data-social-share-success', '');
-              setTimeout(function() {
-                btn.removeAttribute('data-social-share-success');
-              }, 2000);
-            });
-            return;
-          }
-
-          var url = map[type];
-          if (url) window.open(url, '_blank', 'noopener,noreferrer');
-        });
-      });
-    })();
-
-    // =========================
-    // BACK BUTTON
-    // =========================
-    document.querySelectorAll('[data-back]').forEach(function(el) {
-      el.addEventListener('click', function() {
-        history.back();
-      });
-    });
-
-    // =========================
-    // PROGRESS NAVIGATION
-    // =========================
-    (function() {
-      var navProgress = document.querySelector('[data-progress-nav-list]');
-      if (!navProgress) return;
-      if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') {
-        var checkGsap = setInterval(function() {
-          if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
-            clearInterval(checkGsap);
-            initProgressNav();
-          }
-        }, 100);
-        setTimeout(function() { clearInterval(checkGsap); }, 5000);
-        return;
-      }
-      initProgressNav();
-
-      function initProgressNav() {
-        gsap.registerPlugin(ScrollTrigger);
-
-        var indicator = navProgress.querySelector('.progress-nav__indicator');
-        if (!indicator) {
-          indicator = document.createElement('div');
-          indicator.className = 'progress-nav__indicator';
-          navProgress.appendChild(indicator);
-        }
-
-        function updateIndicator(activeLink) {
-          var parentWidth = navProgress.offsetWidth;
-          var parentHeight = navProgress.offsetHeight;
-          var parentRect = navProgress.getBoundingClientRect();
-          var linkRect = activeLink.getBoundingClientRect();
-          
-          var linkPos = {
-            left: linkRect.left - parentRect.left,
-            top: linkRect.top - parentRect.top
-          };
-          
-          var linkWidth = activeLink.offsetWidth;
-          var linkHeight = activeLink.offsetHeight;
-          
-          var leftPercent = (linkPos.left / parentWidth) * 100;
-          var topPercent = (linkPos.top / parentHeight) * 100;
-          var widthPercent = (linkWidth / parentWidth) * 100;
-          var heightPercent = (linkHeight / parentHeight) * 100;
-          
-          indicator.style.left = leftPercent + '%';
-          indicator.style.top = topPercent + '%';
-          indicator.style.width = widthPercent + '%';
-          indicator.style.height = heightPercent + '%';
-        }
-
-        var progressAnchors = gsap.utils.toArray('[data-progress-nav-anchor]');
-
-        progressAnchors.forEach(function(progressAnchor) {
-          var anchorID = progressAnchor.getAttribute('id');
-          
-          ScrollTrigger.create({
-            trigger: progressAnchor,
-            start: '0% 50%',
-            end: '100% 50%',
-            onEnter: function() { activateLink(anchorID); },
-            onEnterBack: function() { activateLink(anchorID); }
-          });
-        });
-
-        function activateLink(anchorID) {
-          var activeLink = navProgress.querySelector('[data-progress-nav-target="#' + anchorID + '"]');
-          if (!activeLink) return;
-          
-          activeLink.classList.add('is--active');
-          var siblings = navProgress.querySelectorAll('[data-progress-nav-target]');
-          siblings.forEach(function(sib) {
-            if (sib !== activeLink) sib.classList.remove('is--active');
-          });
-          updateIndicator(activeLink);
-        }
-      }
-    })();
-
-    // =========================
-    // CSS ANIMATIONS (data-animate)
-    // =========================
-    (function() {
-      var elements = document.querySelectorAll('[data-animate]');
-      if (!elements.length) return;
-
-      var observer = new IntersectionObserver(function(entries) {
-        entries.forEach(function(entry) {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('is-inview');
-          } else {
-            entry.target.classList.remove('is-inview');
-          }
-        });
-      }, {
-        threshold: 0.1,
-        rootMargin: '0px 0px -10% 0px'
-      });
-
-      elements.forEach(function(el) {
-        observer.observe(el);
-      });
-    })();
-
-    // =========================
-    // FORM ENHANCEMENT
-    // =========================
-    document.querySelectorAll('textarea').forEach(function(textarea) {
-      textarea.addEventListener('input', function() {
-        this.style.height = 'auto';
-        this.style.height = this.scrollHeight + 'px';
-      });
-    });
-
-    // =========================
-    // SMOOTH SCROLL
-    // =========================
-    document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {
-      anchor.addEventListener('click', function(e) {
-        var targetId = this.getAttribute('href');
-        if (targetId === '#' || targetId === '#main') return;
-
-        var target = document.querySelector(targetId);
-        if (target) {
-          e.preventDefault();
-          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      });
-    });
-
-    // =========================
-    // IMAGE OPTIMISATION
-    // Voegt srcset, sizes en loading=lazy toe aan alle
-    // Webflow CDN afbeeldingen. Gebruikt Webflow's eigen
-    // image transform API (?w= en ?q= parameters).
-    // Hero afbeeldingen (eerste img in section/header)
-    // krijgen loading=eager + fetchpriority=high.
-    // =========================
-    (function() {
-      var CDN = 'cdn.prod.website-files.com';
-      var WIDTHS = [400, 800, 1200, 1600];
-      var QUALITY = 80;
-
-      var heroImgs = new Set();
-      var firstSection = document.querySelector('section, header');
-      if (firstSection) {
-        var firstImg = firstSection.querySelector('img');
-        if (firstImg) heroImgs.add(firstImg);
-      }
-
-      document.querySelectorAll('img').forEach(function(img) {
-        var src = img.src || img.getAttribute('src') || '';
-        if (!src || src.indexOf(CDN) === -1) return;
-
-        var base = src.split('?')[0];
-
-        var srcset = WIDTHS.map(function(w) {
-          return base + '?w=' + w + '&q=' + QUALITY + ' ' + w + 'w';
-        }).join(', ');
-
-        var sizes = [
-          '(max-width: 479px) 100vw',
-          '(max-width: 767px) 100vw',
-          '(max-width: 991px) 100vw',
-          '(max-width: 1280px) 80vw',
-          '1200px'
-        ].join(', ');
-
-        img.setAttribute('srcset', srcset);
-        img.setAttribute('sizes', sizes);
-        img.setAttribute('src', base + '?w=1200&q=' + QUALITY);
-
-        if (heroImgs.has(img)) {
-          img.setAttribute('loading', 'eager');
-          img.setAttribute('fetchpriority', 'high');
-          img.setAttribute('decoding', 'sync');
-        } else {
-          if (!img.hasAttribute('loading')) {
-            img.setAttribute('loading', 'lazy');
-          }
-          img.setAttribute('decoding', 'async');
-        }
-      });
-    })();
-
-  } // end init
-})();
+          window.scrollTo({ top: Math.min(Math.max(0, target), maxScroll), beh
