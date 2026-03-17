@@ -245,7 +245,6 @@
       var navProgress = document.querySelector('[data-progress-nav-list]');
       if (!navProgress) return;
       if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') {
-        // Wait for GSAP
         var checkGsap = setInterval(function() {
           if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
             clearInterval(checkGsap);
@@ -370,6 +369,61 @@
         }
       });
     });
+
+    // =========================
+    // IMAGE OPTIMISATION
+    // Voegt srcset, sizes en loading=lazy toe aan alle
+    // Webflow CDN afbeeldingen. Gebruikt Webflow's eigen
+    // image transform API (?w= en ?q= parameters).
+    // Hero afbeeldingen (eerste img in section/header)
+    // krijgen loading=eager + fetchpriority=high.
+    // =========================
+    (function() {
+      var CDN = 'cdn.prod.website-files.com';
+      var WIDTHS = [400, 800, 1200, 1600];
+      var QUALITY = 80;
+
+      var heroImgs = new Set();
+      var firstSection = document.querySelector('section, header');
+      if (firstSection) {
+        var firstImg = firstSection.querySelector('img');
+        if (firstImg) heroImgs.add(firstImg);
+      }
+
+      document.querySelectorAll('img').forEach(function(img) {
+        var src = img.src || img.getAttribute('src') || '';
+        if (!src || src.indexOf(CDN) === -1) return;
+
+        var base = src.split('?')[0];
+
+        var srcset = WIDTHS.map(function(w) {
+          return base + '?w=' + w + '&q=' + QUALITY + ' ' + w + 'w';
+        }).join(', ');
+
+        var sizes = [
+          '(max-width: 479px) 100vw',
+          '(max-width: 767px) 100vw',
+          '(max-width: 991px) 100vw',
+          '(max-width: 1280px) 80vw',
+          '1200px'
+        ].join(', ');
+
+        img.setAttribute('srcset', srcset);
+        img.setAttribute('sizes', sizes);
+        img.setAttribute('src', base + '?w=1200&q=' + QUALITY);
+
+        if (heroImgs.has(img)) {
+          img.setAttribute('loading', 'eager');
+          img.setAttribute('fetchpriority', 'high');
+          img.setAttribute('decoding', 'sync');
+        } else {
+          if (!img.hasAttribute('loading')) {
+            img.setAttribute('loading', 'lazy');
+          }
+          img.setAttribute('decoding', 'async');
+        }
+      });
+    })();
 
   } // end init
 })();
