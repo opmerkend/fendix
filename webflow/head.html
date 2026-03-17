@@ -92,15 +92,22 @@
   opacity: 1;
 }
 
-/* === DARK STATE: Text === */
-:root:has(.navbar[start-color="dark"]:not([data-scrolled]):not(:has(.w--open))) :is(
+/* === DARK STATE: Text (inside navbar) ===
+   Single :has() — no nesting, works in all browsers with :has() support */
+.navbar[start-color="dark"]:not([data-scrolled]):not(:has(.w--open)) :is(
   .navbar_link,
-  .topbar-link,
-  .topbar-locale_link,
   .menu-button_label,
   .logo_svg,
   .logo_svg svg,
   .hamburger_line) {
+  color: #fff;
+}
+
+/* === DARK STATE: Text (topbar — outside navbar) ===
+   Uses :root:has() with nested :has(). Modern browsers (2024+) support this. */
+:root:has(.navbar[start-color="dark"]:not([data-scrolled]):not(:has(.w--open))) :is(
+  .topbar-link,
+  .topbar-locale_link) {
   color: #fff;
 }
 
