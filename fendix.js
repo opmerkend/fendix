@@ -379,5 +379,39 @@
       });
     });
 
+    // =========================
+    // IMAGE OPTIMISATION
+    // Alleen non-hero afbeeldingen — hero wordt in head afgehandeld.
+    // =========================
+    (function() {
+      var CDN = 'cdn.prod.website-files.com';
+      var WIDTHS = [400, 800, 1200, 1600];
+      var QUALITY = 80;
+      var heroImg = document.querySelector('section img, header img');
+
+      document.querySelectorAll('img').forEach(function(img) {
+        if (img === heroImg) return;
+        var src = img.getAttribute('src') || '';
+        if (!src || src.indexOf(CDN) === -1) return;
+        var base = src.split('?')[0];
+
+        img.setAttribute('srcset', WIDTHS.map(function(w) {
+          return base + '?w=' + w + '&q=' + QUALITY + ' ' + w + 'w';
+        }).join(', '));
+
+        img.setAttribute('sizes', [
+          '(max-width: 479px) 100vw',
+          '(max-width: 767px) 100vw',
+          '(max-width: 991px) 100vw',
+          '(max-width: 1280px) 80vw',
+          '1200px'
+        ].join(', '));
+
+        img.setAttribute('src', base + '?w=1200&q=' + QUALITY);
+        if (!img.hasAttribute('loading')) img.setAttribute('loading', 'lazy');
+        img.setAttribute('decoding', 'async');
+      });
+    })();
+
   } // end init
 })();
