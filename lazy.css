@@ -414,6 +414,25 @@ li::marker { font-weight: bold; }
   transition: color 300ms, background 300ms, transform 300ms;
 }
 
+.usp-rt strong {
+  font-weight: var(--headings--heading-font-weight);
+  font-family: var(--headings--heading-font-family);
+  ...
+}
+
+.h-display.is-c,
+:is(h1, h2, h3, h4, h5, h6, .h-display) strong {
+  background-image: linear-gradient(...);
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+:is(h1, h2, h3, h4, h5, h6) em,
+:is(h1, h2, h3, h4, h5, h6) i {
+  font-style: normal;
+  color: var(--swatch--proactive-purple);
+}
+
 @media (hover: hover) {
   .main-card:hover .card-background_hover { height: 100%; }
   .main-card:hover .card-title { color: var(--swatch--dark-purple); }
