@@ -433,31 +433,34 @@
       resize();
     });
 
-    // =========================
+// =========================
     // SMOOTH SCROLL (safer)
     // =========================
     (function () {
       var NAV_OFFSET = 80; // adjust if needed
-
       document.addEventListener(
         'click',
         function (e) {
           var a = e.target && e.target.closest ? e.target.closest('a[href^="#"]') : null;
           if (!a) return;
-
           var href = a.getAttribute('href');
           if (!href || href === '#' || href === '#main') return;
-
           // avoid stealing clicks from UI triggers/components
           if (a.hasAttribute('data-modal-target') || a.closest('[data-modal-target]')) return;
           if (a.classList.contains('w-tab-link') || a.closest('.w-tab-menu')) return;
-
           var target = document.querySelector(href);
           if (!target) return;
-
           e.preventDefault();
-          var y = target.getBoundingClientRect().top + window.scrollY - NAV_OFFSET;
-          window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+          var y = Math.max(0, target.getBoundingClientRect().top + window.scrollY - NAV_OFFSET);
+          var startY = window.scrollY;
+          var diff = y - startY;
+          var startTime = null;
+          (function step(ts) {
+            if (!startTime) startTime = ts;
+            var p = Math.min((ts - startTime) / 400, 1);
+            window.scrollTo(0, startY + diff * (p < .5 ? 2*p*p : -1+(4-2*p)*p));
+            if (p < 1) requestAnimationFrame(step);
+          })(performance.now());
         },
         true
       );
