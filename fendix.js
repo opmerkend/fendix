@@ -1,5 +1,5 @@
 /**
- * FENDIX.JS v1.8.0 — incl. draggable marquee module */
+ * FENDIX.JS v1.9.0 — marquee-module + centrale Finsweet-loader (list/toc/inject) + menu-warmup */
 (function () {
   'use strict';
 
@@ -145,12 +145,18 @@
     });
 
     // =========================
-    // FINSWEET LAZY LOADER + FILTER SCROLL (no forced 3s load)
+    // FINSWEET ATTRIBUTES v2 — centrale loader (list lazy, toc/inject direct)
     // =========================
     (function () {
-      var fsList = document.querySelector('[fs-list-element="list"]');
-      if (!fsList) return;
+      // Eén centrale Finsweet-loader (v1.9.0): detecteert welke modules de pagina nodig heeft.
+      // - toc/inject (artikelpagina's): direct laden, bepalen de weergave
+      // - list/filters: lazy laden zodra de lijst in beeld komt of een filter wordt aangeraakt
+      var listEl = document.querySelector('[fs-list-element]');
+      var tocEl = document.querySelector('[fs-toc-element]');
+      var injectEl = document.querySelector('[fs-inject], [fs-inject-element]');
+      if (!listEl && !tocEl && !injectEl) return;
 
+      var fsList = document.querySelector('[fs-list-element="list"]') || listEl;
       var filters = document.querySelector('[data-filters]');
       var results = document.querySelector('[data-results]') || fsList;
 
@@ -168,12 +174,17 @@
         var script = document.createElement('script');
         script.type = 'module';
         script.src = 'https://cdn.jsdelivr.net/npm/@finsweet/attributes@2/attributes.js';
-        script.setAttribute('fs-list', '');
+        if (listEl) script.setAttribute('fs-list', '');
+        if (tocEl) script.setAttribute('fs-toc', '');
+        if (injectEl) script.setAttribute('fs-inject', '');
         document.body.appendChild(script);
 
         if (io) io.disconnect();
         window.removeEventListener('scroll', onScrollCheck);
       }
+
+      if (tocEl || injectEl) loadFinsweet();
+      if (!listEl) return;
 
       if (filters) {
         filters.addEventListener(
@@ -208,7 +219,7 @@
         });
       }).observe(results, { childList: true });
 
-      if ('IntersectionObserver' in window) {
+      if (!loaded && 'IntersectionObserver' in window) {
         io = new IntersectionObserver(
           function (entries) {
             if (entries[0] && entries[0].isIntersecting) loadFinsweet();
@@ -222,7 +233,7 @@
         var rect = triggerElement.getBoundingClientRect();
         if (rect.top < window.innerHeight + 500) loadFinsweet();
       }
-      window.addEventListener('scroll', onScrollCheck, { passive: true });
+      if (!loaded) window.addEventListener('scroll', onScrollCheck, { passive: true });
     })();
 
     // =========================
@@ -612,6 +623,28 @@
   window.addEventListener("resize", () => requestAnimationFrame(initDraggableMarquee));
 
   window.initDraggableMarquee = initDraggableMarquee;
+    })();
+
+    // =========================
+    // MENU-WARMUP (v1.9.0 — voorheen los footer-snippet)
+    // Laadt en decodeert menu-afbeeldingen tijdens browser-idle,
+    // zodat het openen van het menu geen laad/decode-burst krijgt
+    // =========================
+    (function () {
+      function warm() {
+        document.querySelectorAll('.navbar_menu img').forEach(function (img) {
+          try {
+            img.decoding = 'async';
+            img.loading = 'eager';
+            if (img.decode) img.decode().catch(function () {});
+          } catch (e) {}
+        });
+      }
+      if ('requestIdleCallback' in window) {
+        requestIdleCallback(warm, { timeout: 4000 });
+      } else {
+        setTimeout(warm, 2500);
+      }
     })();
   }
 })();
