@@ -1,5 +1,5 @@
 /**
- * FENDIX.JS */
+ * FENDIX.JS v1.8.0 — incl. draggable marquee module */
 (function () {
   'use strict';
 
@@ -461,6 +461,157 @@
         },
         true
       );
+    })();
+
+    // =========================
+    // DRAGGABLE MARQUEE (v1.8.0 — verhuisd uit Webflow footer-embed "code-js-marquee")
+    // Vereist gsap + ScrollTrigger (+ ingebouwde Observer); loader staat in de site-footer
+    // =========================
+    (function () {
+
+  const SELECTOR = "[data-draggable-marquee-init]";
+
+  const num = (el, name, fallback) => {
+    const v = parseFloat(el.getAttribute(name));
+    return Number.isFinite(v) ? v : fallback;
+  };
+
+  const bool = (el, name, fallback = false) => {
+    const raw = (el.getAttribute(name) || "").toLowerCase().trim();
+    if (raw === "true") return true;
+    if (raw === "false") return false;
+    return fallback;
+  };
+
+  const canUseGsap = () =>
+    window.gsap && window.ScrollTrigger && window.Observer;
+
+  const setup = (wrapper) => {
+    if (wrapper.getAttribute("data-draggable-marquee-init") === "initialized") return true;
+    if (!canUseGsap()) return false;
+
+    const collection = wrapper.querySelector("[data-draggable-marquee-collection]");
+    const list = wrapper.querySelector("[data-draggable-marquee-list]");
+    if (!collection || !list) return false;
+
+    const duration = num(wrapper, "data-duration", 20);
+    const multiplier = num(wrapper, "data-multiplier", 40);
+    const sensitivity = num(wrapper, "data-sensitivity", 0.01);
+    const pauseView = bool(wrapper, "data-pauseview", true);
+
+    const wrapperWidth = wrapper.getBoundingClientRect().width;
+    const listWidth = list.scrollWidth || list.getBoundingClientRect().width;
+    if (!wrapperWidth || !listWidth) return false;
+
+    const minRequiredWidth = wrapperWidth + listWidth + 2;
+    let guard = 0;
+
+    while (collection.scrollWidth < minRequiredWidth && guard < 50) {
+      const clone = list.cloneNode(true);
+      clone.setAttribute("data-draggable-marquee-clone", "");
+      clone.setAttribute("aria-hidden", "true");
+      collection.appendChild(clone);
+      guard++;
+    }
+
+    const wrapX = gsap.utils.wrap(-listWidth, 0);
+    gsap.set(collection, { x: 0 });
+
+    const marqueeLoop = gsap.to(collection, {
+      x: -listWidth,
+      duration,
+      ease: "none",
+      repeat: -1,
+      onReverseComplete: () => marqueeLoop.progress(1),
+      modifiers: {
+        x: (x) => wrapX(parseFloat(x)) + "px"
+      }
+    });
+
+    const initialDirection =
+      (wrapper.getAttribute("data-direction") || "left").toLowerCase() === "right"
+        ? -1
+        : 1;
+
+    const timeScale = { value: initialDirection };
+    if (initialDirection < 0) marqueeLoop.progress(1);
+
+    const applyTimeScale = () => {
+      marqueeLoop.timeScale(timeScale.value);
+      wrapper.setAttribute("data-direction", timeScale.value < 0 ? "right" : "left");
+    };
+
+    applyTimeScale();
+
+    const observer = Observer.create({
+      target: wrapper,
+      type: "pointer,touch",
+      preventDefault: true,
+      debounce: false,
+      onChangeX: (ev) => {
+        let v = ev.velocityX * -sensitivity;
+        v = gsap.utils.clamp(-multiplier, multiplier, v);
+
+        gsap.killTweensOf(timeScale);
+
+        const rest = v < 0 ? -1 : 1;
+
+        gsap.timeline({ onUpdate: applyTimeScale })
+          .to(timeScale, { value: v, duration: 0.1, overwrite: true })
+          .to(timeScale, { value: rest, duration: 1.0 });
+      }
+    });
+
+    if (pauseView) {
+      ScrollTrigger.create({
+        trigger: wrapper,
+        start: "top bottom",
+        end: "bottom top",
+        onEnter: () => { marqueeLoop.resume(); observer.enable(); },
+        onEnterBack: () => { marqueeLoop.resume(); observer.enable(); },
+        onLeave: () => { marqueeLoop.pause(); observer.disable(); },
+        onLeaveBack: () => { marqueeLoop.pause(); observer.disable(); }
+      });
+    } else {
+      marqueeLoop.resume();
+      observer.enable();
+    }
+
+    wrapper.setAttribute("data-draggable-marquee-init", "initialized");
+    return true;
+  };
+
+  const initDraggableMarquee = () => {
+    document.querySelectorAll(SELECTOR).forEach((wrapper) => {
+      if (wrapper.getAttribute("data-draggable-marquee-init") === "initialized") return;
+
+      let tries = 0;
+      const tryInit = () => {
+        if (setup(wrapper)) return;
+        tries++;
+        if (tries > 12) return;
+        requestAnimationFrame(tryInit);
+      };
+
+      const io = new IntersectionObserver((entries) => {
+        if (!entries[0]?.isIntersecting) return;
+        io.disconnect();
+        tryInit();
+      });
+
+      io.observe(wrapper);
+    });
+  };
+
+  if (window.gsap && window.ScrollTrigger && window.Observer) {
+    try { gsap.registerPlugin(ScrollTrigger, Observer); } catch (e) {}
+  }
+  initDraggableMarquee();
+
+  window.addEventListener("load", initDraggableMarquee);
+  window.addEventListener("resize", () => requestAnimationFrame(initDraggableMarquee));
+
+  window.initDraggableMarquee = initDraggableMarquee;
     })();
   }
 })();
