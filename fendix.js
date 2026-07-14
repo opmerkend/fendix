@@ -1,5 +1,5 @@
 /**
- * FENDIX.JS v1.9.0 — marquee-module + centrale Finsweet-loader (list/toc/inject) + menu-warmup */
+ * FENDIX.JS v1.10.0 — marquee + Finsweet-loader + menu-warmup + team-lijst module */
 (function () {
   'use strict';
 
@@ -645,6 +645,47 @@
       } else {
         setTimeout(warm, 2500);
       }
+    })();
+
+    // =========================
+    // TEAM-LIJST (v1.10.0 — voorheen page-code op /team)
+    // Statisch item op vaste positie in de Finsweet-lijst + modal-gradients
+    // Draait alleen als beide markers bestaan
+    // =========================
+    (function () {
+      var list = document.querySelector('[fs-list-element="list"]');
+      var staticItem = document.querySelector('[fs-list-element="item"]');
+      if (!list || !staticItem) return;
+
+      var position = parseInt(staticItem.getAttribute('fs-list-position'), 10) || 7;
+      var items = list.children;
+
+      if (position <= items.length) {
+        list.insertBefore(staticItem, items[position - 1]);
+      } else {
+        list.appendChild(staticItem);
+      }
+
+      var gradients = [
+        { start: '--_effects---brand-gradients--proactive-purple-start', end: '--_effects---brand-gradients--proactive-purple-end' },
+        { start: '--_effects---brand-gradients--dark-purple-start', end: '--_effects---brand-gradients--dark-purple-end' },
+        { start: '--_effects---brand-gradients--future-cyan-start', end: '--_effects---brand-gradients--future-cyan-end' },
+        { start: '--_effects---brand-gradients--nextgen-blue-start', end: '--_effects---brand-gradients--nextgen-blue-end' },
+        { start: '--_effects---brand-gradients--gen-c-green-start', end: '--_effects---brand-gradients--gen-c-green-end' }
+      ];
+
+      var modals = document.querySelectorAll('.c-list_wrapper .modal-wrapper');
+      if (!modals.length) return;
+
+      var skipPosition = position - 1;
+      modals.forEach(function (modal, index) {
+        var colorIndex = index >= skipPosition ? index + 1 : index;
+        var grad = gradients[colorIndex % 5];
+        var teamImage = modal.querySelector('.team-image_modal');
+        if (teamImage) {
+          teamImage.style.backgroundImage = 'linear-gradient(180deg, var(' + grad.start + '), var(' + grad.end + '))';
+        }
+      });
     })();
   }
 })();

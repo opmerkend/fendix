@@ -1,6 +1,6 @@
 /**
- * SWIPER-INIT.JS
- * All Swiper slider configurations for Fendix
+ * SWIPER-INIT.JS v1.10.0
+ * All Swiper slider configurations for Fendix (incl. hero coverflow, voorheen page-code)
  */
 (function () {
   'use strict';
@@ -87,6 +87,47 @@
   }
 
   function init() {
+    // =========================
+    // HERO SLIDER (coverflow + autoplay — voorheen page-code op /over-ons)
+    // =========================
+    document.querySelectorAll('.hero-slider_component').forEach(function (component) {
+      var el = component.querySelector('.swiper');
+      if (!el) return;
+
+      var slides = el.querySelectorAll('.swiper-slide');
+      if (slides.length <= 1) return; // geen autoplay/slider nodig bij 1 slide
+
+      new Swiper(el, {
+        slidesPerView: 1,
+        effect: 'coverflow',
+        coverflowEffect: {
+          rotate: 5,
+          scale: 0.95,
+          stretch: 0,
+          depth: 0,
+          slideShadows: false
+        },
+        speed: 1000,
+        loop: false,
+        centeredSlides: false,
+        initialSlide: 0,
+        autoplay: {
+          delay: 3000,
+          disableOnInteraction: false,
+          pauseOnMouseEnter: true
+        },
+        allowTouchMove: true,
+        grabCursor: true,
+        mousewheel: { forceToAxis: true },
+        keyboard: { enabled: true, onlyInViewport: true },
+        breakpoints: {
+          576: {
+            coverflowEffect: { scale: 0.85, slideShadows: false }
+          }
+        }
+      });
+    });
+
     // =========================
     // CASE SLIDER (rewind)
     // =========================
