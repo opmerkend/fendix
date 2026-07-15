@@ -1,5 +1,5 @@
 <!-- =========================
-  HEAD CODE — herstructurering 2026-07-14
+  HEAD CODE 
 ========================= -->
 <!-- Preconnects -->
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
@@ -63,7 +63,7 @@ section,header,footer{position:relative}
   :root[data-nav-open]{overflow:hidden;padding-right:var(--scrollbar-width,0px)}
 
 /* ============================================================
-   5. VIEW-TRANSITIONS (paginawissel; mobiel uit — zie sectie 9)
+   5. VIEW-TRANSITIONS
 ============================================================ */
 @view-transition{navigation:auto}
 .navbar,.topbar{view-transition-name:none}
@@ -73,15 +73,14 @@ section,header,footer{position:relative}
 ::view-transition-new(root){animation:80ms ease-in fade-in}
 
 /* ============================================================
-   6. NAVBAR & TOPBAR — kleuren, achtergronden, states
-   (aangestuurd door data-attributen uit het nav-script hieronder)
+   6. NAVBAR & TOPBAR
 ============================================================ */
 .navbar_link,.topbar-link,.topbar-locale_link,.menu-button_label,.logo_svg,.logo_svg svg,.hamburger_line{
   transition:color var(--nav-duration) var(--nav-ease),background-color var(--nav-duration) var(--nav-ease);
 }
-/* Hamburger: transform meeanimeren (kruisje vormt vloeiend, synchroon met menu-label 350ms) */
+
 .hamburger_line{transition:color var(--nav-duration) var(--nav-ease),background-color var(--nav-duration) var(--nav-ease),transform 350ms var(--nav-ease)}
-/* Topbar-banner: verborgen zodra bezoeker hem eerder wegklikte (zie script na dit blok) */
+
 .topbar-hidden .topbar-banner-wrap{display:none}
 
 .navbar_scroll_background,
@@ -115,12 +114,12 @@ section,header,footer{position:relative}
 .navbar_scroll_background.no-transition,
 .topbar_background.no-transition{transition:none !important}
 
-/* Donkere startstand (bovenaan donkere pagina's) */
+
 .navbar[start-color="dark"]:not([data-scrolled]):not([data-nav-open]) :is(.navbar_link,.menu-button_label,.logo_svg,.logo_svg svg,.hamburger_line){color:#fff}
 :root[data-nav-dark] :is(.topbar-link,.topbar-locale_link){color:#fff}
 :root[data-nav-dark] .topbar{background-image:linear-gradient(180deg,rgba(0,0,0,0.25),rgba(0,0,0,0))}
 
-/* Glas-effect navbar */
+
 .navbar_background{
   -webkit-backdrop-filter:blur(0.75rem) saturate(1.4);
   backdrop-filter:blur(0.75rem) saturate(1.4);
@@ -149,7 +148,7 @@ section,header,footer{position:relative}
 }
 
 /* ============================================================
-   7. NAV-OVERLAY (verduistering achter open menu, alle breakpoints)
+   7. NAV-OVERLAY 
 ============================================================ */
 .nav-overlay{
   position:fixed;inset:0;z-index:1;height:0;opacity:0 !important;visibility:hidden !important;pointer-events:none !important;
@@ -167,14 +166,14 @@ section,header,footer{position:relative}
 .navbar_menu-button,.navbar_link,.topbar-link{touch-action:manipulation}
 
 /* ============================================================
-   9. MOBIEL (≤991px) — menu-gedrag & performance
+   9. MOBIEL (≤991px) 
 ============================================================ */
 @keyframes menu-in{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
 @media (max-width:991px){
-  /* Paginawissel: geen view-transition (direct = sneller gevoel) */
+
   ::view-transition-old(root),::view-transition-new(root){animation:none}
 
-  /* Menu: volle breedte + subtiele fade-in (compenseert navbar-container padding) */
+
   .navbar_menu[data-nav-menu-open]{
     width:100vw !important;
     max-width:none !important;
@@ -183,8 +182,6 @@ section,header,footer{position:relative}
     animation:menu-in 280ms cubic-bezier(.4,0,.2,1) 140ms both;
   }
 
-  /* Realtime blur is zwaar voor mobiele GPU's:
-     overlay-blur uit (donkerder ter compensatie), navbar-blur gehalveerd */
   .nav-overlay{backdrop-filter:none;-webkit-backdrop-filter:none;background:rgba(0,0,0,.5)}
   .navbar_background,
   .navbar[start-color="dark"]:not([data-scrolled]):not([data-nav-open]) .navbar_background{
@@ -196,7 +193,7 @@ section,header,footer{position:relative}
     -webkit-backdrop-filter:none !important;
     backdrop-filter:none !important;
   }
-
+}
 
 /* ============================================================
    10. EXTRA SMAL (≤370px)
@@ -223,7 +220,7 @@ try{if(localStorage.getItem('topbarClicked')==='true'){document.documentElement.
 (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ct.fendix.nl/iibqfs975h.js?tg='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','MDQZW87X');
 </script>
 <!-- End Server Side Tracking by Taggrs.io -->
-<!-- Nav/topbar state-script: zet data-scrolled / data-nav-open / data-nav-dark op navbar en <html> -->
+<!-- Nav/topbar state-script -->
 <script>
 (function () {
   var nav = null;
