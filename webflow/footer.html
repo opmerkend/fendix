@@ -1,0 +1,80 @@
+<!-- =========================
+  FOOTER CODE
+========================= -->
+<!-- Server Side Tracking by Taggrs.io (noscript) -->
+<noscript>
+  <iframe src="https://ct.fendix.nl/iibqfs975h.html?tg=MDQZW87X" height="0" width="0" style="display:none;visibility:hidden"></iframe>
+</noscript>
+<!-- End Server Side Tracking by Taggrs.io (noscript) -->
+<!-- Lazy CSS -->
+<link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/opmerkend/fendix@v1.10.0/lazy.css"
+      media="print"
+      onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/opmerkend/fendix@v1.10.0/lazy.css"></noscript>
+<!-- Animate CSS (bewust vroeg geladen: zet initial-states, voorkomt flits) -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/opmerkend/fendix@v1.10.0/animate.css">
+<!-- Fendix JS -->
+<script defer src="https://cdn.jsdelivr.net/gh/opmerkend/fendix@v1.10.0/fendix.js"></script>
+<!-- Swiper (only when real slider components exist) -->
+<script>
+(function () {
+  var needsSwiper = !!document.querySelector(
+    '.hero-slider_component, .case-slider_component, .team-slider_component, .partner-slider_component, .value-slider_component, .steps-slider_component'
+  );
+  if (!needsSwiper) return;
+  var css = document.createElement('link');
+  css.rel = 'stylesheet';
+  css.href = 'https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css';
+  css.media = 'print';
+  css.onload = function () { css.media = 'all'; };
+  document.head.appendChild(css);
+  var js = document.createElement('script');
+  js.src = 'https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js';
+  js.async = true;
+  js.onload = function () {
+    var init = document.createElement('script');
+    init.src = 'https://cdn.jsdelivr.net/gh/opmerkend/fendix@v1.10.0/swiper-init.js';
+    init.async = true;
+    document.body.appendChild(init);
+  };
+  document.body.appendChild(js);
+})();
+</script>
+<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"></noscript>
+
+<!-- GSAP (altijd volledige bundle als marquee of progress nav aanwezig) -->
+<script>
+(function () {
+  var needsGsap = !!document.querySelector(
+    '[data-draggable-marquee-init], [data-progress-nav-list], [data-gsap]'
+  );
+  if (!needsGsap) return;
+  if (window.gsap && window.ScrollTrigger && window.Observer) return;
+  var s = document.createElement('script');
+s.src = 'https://cdn.jsdelivr.net/combine/npm/gsap@3.15.0/dist/gsap.min.js,npm/gsap@3.15.0/dist/ScrollTrigger.min.js,npm/gsap@3.15.0/dist/Observer.min.js';
+  s.async = true;
+  document.body.appendChild(s);
+})();
+</script>
+<!-- Fendix Tracking (uitgesteld: na scroll/toetsaanslag of 3s zodat de eerste interactie vlot blijft) -->
+<script>
+(function(){
+  var loaded = false;
+  function loadTracking(){
+    if (loaded) return;
+    loaded = true;
+    var inject = function(){
+      var s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/gh/measurebase/next-gen-fendix-nick@main/tracking-test.js';
+      s.async = true;
+      document.body.appendChild(s);
+    };
+    if ('requestIdleCallback' in window) { requestIdleCallback(inject, { timeout: 2000 }); } else { setTimeout(inject, 250); }
+  }
+  ['scroll','keydown'].forEach(function(e){
+    document.addEventListener(e, loadTracking, { once:true, passive:true });
+  });
+  setTimeout(loadTracking, 3000);
+})();
+</script>
