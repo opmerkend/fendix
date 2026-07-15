@@ -1,0 +1,291 @@
+<!-- =========================
+  HEAD CODE — herstructurering 2026-07-14
+========================= -->
+<!-- Preconnects -->
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="preconnect" href="https://cdn.prod.website-files.com" crossorigin>
+<!-- Font preload -->
+<link rel="preload"
+      href="https://cdn.prod.website-files.com/693ab098ced1619a3009f4fe/69b91d2e0fea3b1165c8fb20_DMSans-VariableFont_opsz%2Cwght.woff2"
+      as="font" type="font/woff2" crossorigin>
+<style>
+/* ============================================================
+   1. FONT
+============================================================ */
+@font-face{
+  font-family:"DM Sans";
+  src:url("https://cdn.prod.website-files.com/693ab098ced1619a3009f4fe/69b91d2e0fea3b1165c8fb20_DMSans-VariableFont_opsz%2Cwght.woff2") format("woff2");
+  font-weight:100 900;
+  font-style:normal;
+  font-display:swap;
+}
+html{font-optical-sizing:auto}
+
+/* ============================================================
+   2. VARIABELEN
+============================================================ */
+:root{
+  --nav-duration:200ms;
+  --nav-ease:cubic-bezier(.4,0,.2,1);
+  --font-weight--400:400;
+  --font-weight--500:500;
+  --font-weight--600:600;
+  --font-weight--700:700;
+  --transition-button-duration:300ms;
+  --transition-button-ease:cubic-bezier(0.645,0.045,0.355,1);
+}
+
+/* ============================================================
+   3. BASIS-ELEMENTEN
+============================================================ */
+body{font-weight:var(--body--body-font-weight);line-height:var(--body--body-line-height);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+h1,h2,h3,h4,h5,h6{font-weight:var(--headings--heading-font-weight);color:var(--_theme---headings--heading-font-colour);margin-top:0}
+p,label,blockquote{margin:0}
+strong{font-weight:var(--body--body-strong)}
+button{background-color:unset;padding:unset;cursor:pointer}
+img{box-sizing:border-box;user-select:none}
+img::selection{background:transparent}
+video{width:100%;object-fit:cover}
+video.wf-empty{padding:0}
+svg{display:block}
+section,header,footer{position:relative}
+
+/* ============================================================
+   4. MODALS
+============================================================ */
+[data-modal-group-status="non-active"],
+[data-modal-status="non-active"]{opacity:0}
+[data-modal-group-status="active"],
+[data-modal-status="active"]{opacity:1}
+.modal-wrapper{opacity:0}
+[data-modal-group-status="active"] .modal-wrapper{opacity:1}
+[data-modal-open]{overflow:hidden;padding-right:var(--scrollbar-width,0px)}
+  :root[data-nav-open]{overflow:hidden;padding-right:var(--scrollbar-width,0px)}
+
+/* ============================================================
+   5. VIEW-TRANSITIONS (paginawissel; mobiel uit — zie sectie 9)
+============================================================ */
+@view-transition{navigation:auto}
+.navbar,.topbar{view-transition-name:none}
+@keyframes fade-out{to{opacity:0}}
+@keyframes fade-in{from{opacity:0}to{opacity:1}}
+::view-transition-old(root){animation:120ms ease-out fade-out}
+::view-transition-new(root){animation:80ms ease-in fade-in}
+
+/* ============================================================
+   6. NAVBAR & TOPBAR — kleuren, achtergronden, states
+   (aangestuurd door data-attributen uit het nav-script hieronder)
+============================================================ */
+.navbar_link,.topbar-link,.topbar-locale_link,.menu-button_label,.logo_svg,.logo_svg svg,.hamburger_line{
+  transition:color var(--nav-duration) var(--nav-ease),background-color var(--nav-duration) var(--nav-ease);
+}
+/* Hamburger: transform meeanimeren (kruisje vormt vloeiend, synchroon met menu-label 350ms) */
+.hamburger_line{transition:color var(--nav-duration) var(--nav-ease),background-color var(--nav-duration) var(--nav-ease),transform 350ms var(--nav-ease)}
+/* Topbar-banner: verborgen zodra bezoeker hem eerder wegklikte (zie script na dit blok) */
+.topbar-hidden .topbar-banner-wrap{display:none}
+
+.navbar_scroll_background,
+.topbar_background{
+  height:100%;
+  overflow:hidden;
+  -webkit-clip-path:inset(0 0 100% 0);
+  clip-path:inset(0 0 100% 0);
+  transition:clip-path var(--nav-duration) var(--nav-ease),-webkit-clip-path var(--nav-duration) var(--nav-ease);
+  contain:layout style paint;
+}
+.topbar_background{
+  opacity:0;
+  transition:clip-path var(--nav-duration) var(--nav-ease),-webkit-clip-path var(--nav-duration) var(--nav-ease),opacity var(--nav-duration);
+}
+.navbar[data-scrolled] .navbar_scroll_background,
+.navbar[data-nav-open] .navbar_scroll_background{-webkit-clip-path:inset(0);clip-path:inset(0)}
+  
+  
+
+  
+.navbar[data-nav-open] .navbar_scroll_background{
+  border-bottom-left-radius:0;
+  border-bottom-right-radius:0;
+}
+
+  
+:root[data-nav-scrolled] .topbar_background,
+:root[data-nav-open] .topbar_background{-webkit-clip-path:inset(0);clip-path:inset(0);opacity:1}
+  
+.navbar_scroll_background.no-transition,
+.topbar_background.no-transition{transition:none !important}
+
+/* Donkere startstand (bovenaan donkere pagina's) */
+.navbar[start-color="dark"]:not([data-scrolled]):not([data-nav-open]) :is(.navbar_link,.menu-button_label,.logo_svg,.logo_svg svg,.hamburger_line){color:#fff}
+:root[data-nav-dark] :is(.topbar-link,.topbar-locale_link){color:#fff}
+:root[data-nav-dark] .topbar{background-image:linear-gradient(180deg,rgba(0,0,0,0.25),rgba(0,0,0,0))}
+
+/* Glas-effect navbar */
+.navbar_background{
+  -webkit-backdrop-filter:blur(0.75rem) saturate(1.4);
+  backdrop-filter:blur(0.75rem) saturate(1.4);
+  box-shadow:0 1px 2px rgba(0,0,0,0.05),inset 0 1px 0 rgba(255,255,255,0.4);
+}
+.navbar[start-color="dark"]:not([data-scrolled]):not([data-nav-open]) .navbar_background{
+  -webkit-backdrop-filter:blur(0.75rem) saturate(1.2);
+  backdrop-filter:blur(0.75rem) saturate(1.2);
+  background-image:linear-gradient(180deg,rgba(255,255,255,0.19),rgba(255,255,255,0.01)) !important;
+  box-shadow:0 1px 2px rgba(0,0,0,0.1),inset 0 2px 10px rgba(255,255,255,0.2);
+}
+.navbar_background::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  padding:1px;
+  border-radius:inherit;
+  pointer-events:none;
+  background:linear-gradient(-30deg,rgba(255,255,255,.5),rgba(255,255,255,.25));
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;
+  mask-composite:exclude;
+}
+.navbar[start-color="dark"]:not([data-scrolled]):not([data-nav-open]) .navbar_background::before{
+  background:linear-gradient(0deg,rgba(255,255,255,0.1),rgba(255,255,255,0.3));
+}
+
+/* ============================================================
+   7. NAV-OVERLAY (verduistering achter open menu, alle breakpoints)
+============================================================ */
+.nav-overlay{
+  position:fixed;inset:0;z-index:1;height:0;opacity:0 !important;visibility:hidden !important;pointer-events:none !important;
+  background:rgba(0,0,0,.35);backdrop-filter:blur(6px);
+  transition:opacity 200ms,visibility 0s linear 200ms;
+}
+.navbar[data-nav-open] .nav-overlay{
+  height:100dvh;opacity:1 !important;visibility:visible !important;pointer-events:auto !important;
+  transition:opacity 200ms,visibility 0s;
+}
+
+/* ============================================================
+   8. TIK-RESPONS
+============================================================ */
+.navbar_menu-button,.navbar_link,.topbar-link{touch-action:manipulation}
+
+/* ============================================================
+   9. MOBIEL (≤991px) — menu-gedrag & performance
+============================================================ */
+@keyframes menu-in{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
+@media (max-width:991px){
+  /* Paginawissel: geen view-transition (direct = sneller gevoel) */
+  ::view-transition-old(root),::view-transition-new(root){animation:none}
+
+  /* Menu: volle breedte + subtiele fade-in (compenseert navbar-container padding) */
+  .navbar_menu[data-nav-menu-open]{
+    width:100vw !important;
+    max-width:none !important;
+    left:calc(var(--padding--container) / -2);
+    border-radius:0;
+    animation:menu-in 280ms cubic-bezier(.4,0,.2,1) 140ms both;
+  }
+
+  /* Realtime blur is zwaar voor mobiele GPU's:
+     overlay-blur uit (donkerder ter compensatie), navbar-blur gehalveerd */
+  .nav-overlay{backdrop-filter:none;-webkit-backdrop-filter:none;background:rgba(0,0,0,.5)}
+  .navbar_background,
+  .navbar[start-color="dark"]:not([data-scrolled]):not([data-nav-open]) .navbar_background{
+    -webkit-backdrop-filter:blur(0.375rem) saturate(1.1) !important;
+    backdrop-filter:blur(0.375rem) saturate(1.1) !important;
+  }
+
+  .navbar[data-nav-open] .navbar_background{
+    -webkit-backdrop-filter:none !important;
+    backdrop-filter:none !important;
+  }
+
+
+/* ============================================================
+   10. EXTRA SMAL (≤370px)
+============================================================ */
+@media (max-width:370px){
+  .navbar_content_grid.expertise{display:flex;flex-wrap:wrap}
+  .navbar_content_grid.expertise .navbar_content_grid_col{flex:1 1 250px}
+}
+
+/* ============================================================
+   11. DIVERSEN & TOEGANKELIJKHEID
+============================================================ */
+.case-slider_component{min-height:38rem}
+@media (prefers-reduced-motion:reduce){
+  .navbar_menu[data-nav-menu-open]{animation:none}
+}
+</style>
+<script>
+try{if(localStorage.getItem('topbarClicked')==='true'){document.documentElement.classList.add('topbar-hidden');}}catch(e){}
+</script>
+<meta name="theme-color" content="#200433">
+<!-- Server Side Tracking by Taggrs.io -->
+<script>
+(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ct.fendix.nl/iibqfs975h.js?tg='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','MDQZW87X');
+</script>
+<!-- End Server Side Tracking by Taggrs.io -->
+<!-- Nav/topbar state-script: zet data-scrolled / data-nav-open / data-nav-dark op navbar en <html> -->
+<script>
+(function () {
+  var nav = null;
+  var ticking = false;
+  var lastOpen = null;
+  function computeOpen() {
+    return nav ? !!nav.querySelector('.w--open') : false;
+  }
+  function updateRootDark(open, scrolled) {
+    if (!nav) return;
+    var dark = nav.getAttribute('start-color') === 'dark' && !scrolled && !open;
+    document.documentElement.toggleAttribute('data-nav-dark', dark);
+  }
+  function update() {
+    if (!nav) return;
+    var scrolled = window.scrollY > 0;
+    nav.toggleAttribute('data-scrolled', scrolled);
+    var open = computeOpen();
+    if (open !== lastOpen) {
+      nav.toggleAttribute('data-nav-open', open);
+      lastOpen = open;
+    }
+    document.documentElement.toggleAttribute('data-nav-scrolled', scrolled);
+    document.documentElement.toggleAttribute('data-nav-open', open);
+    updateRootDark(open, scrolled);
+  }
+  function init() {
+    nav = document.querySelector('.navbar');
+    if (!nav) return;
+    if (window.scrollY > 0) {
+      var nb = nav.querySelector('.navbar_scroll_background');
+      var tb = document.querySelector('.topbar_background');
+      if (nb) nb.classList.add('no-transition');
+      if (tb) tb.classList.add('no-transition');
+      nav.setAttribute('data-scrolled', '');
+      document.documentElement.setAttribute('data-nav-scrolled', '');
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          if (nb) nb.classList.remove('no-transition');
+          if (tb) tb.classList.remove('no-transition');
+        });
+      });
+    }
+    update();
+    new MutationObserver(update).observe(nav, {
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['class']
+    });
+  }
+  window.addEventListener('scroll', function () {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(function () {
+      update();
+      ticking = false;
+    });
+  }, { passive: true });
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init, { once: true });
+  } else {
+    init();
+  }
+})();
+</script>
