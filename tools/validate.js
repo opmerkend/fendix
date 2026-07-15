@@ -177,4 +177,3 @@ if (fouten) {
 } else {
   console.log('RESULTAAT: alles schoon (' + waarschuwingen + ' waarschuwing(en)) — veilig om te plakken/taggen ✓');
 }
-</parameter>
