@@ -4,9 +4,13 @@
 <!-- Preconnects -->
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="preconnect" href="https://cdn.prod.website-files.com" crossorigin>
+<link rel="preconnect" href="https://ct.fendix.nl">
 <!-- Font preload -->
 <link rel="preload"
       href="https://cdn.prod.website-files.com/693ab098ced1619a3009f4fe/69b91d2e0fea3b1165c8fb20_DMSans-VariableFont_opsz%2Cwght.woff2"
+      as="font" type="font/woff2" crossorigin>
+<link rel="preload"
+      href="https://cdn.prod.website-files.com/693ab098ced1619a3009f4fe/693ab7c163b0366b9a6b45d7_ESKlarheitGrotesk-Smbd.woff2"
       as="font" type="font/woff2" crossorigin>
 <style>
 /* ============================================================
@@ -215,6 +219,15 @@ section,header,footer{position:relative}
 try{if(localStorage.getItem('topbarClicked')==='true'){document.documentElement.classList.add('topbar-hidden');}}catch(e){}
 </script>
 <meta name="theme-color" content="#200433">
+<!-- Interne links prefetchen bij hover -->
+<script type="speculationrules">
+{
+  "prefetch": [{
+    "where": { "href_matches": "/*" },
+    "eagerness": "moderate"
+  }]
+}
+</script>
 <!-- Server Side Tracking by Taggrs.io -->
 <script>
 (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ct.fendix.nl/iibqfs975h.js?tg='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','MDQZW87X');
