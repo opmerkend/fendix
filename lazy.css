@@ -1,5 +1,8 @@
 /* ==========================================================================
-   LAZY.CSS (v1.7.1 — fix 1.2: placeholders hersteld)
+   LAZY.CSS (v1.11.0 — dode regels verwijderd na sitebrede gebruiksscan 16-07-2026)
+   Geschrapt: css-marquee (vervangen door data-draggable-marquee in fendix.js),
+   .reset-animations, .has-clippath, .footer (class bestaat niet),
+   .nav-tab_icon.current (combo-class bestaat niet meer in Webflow)
    ========================================================================== */
 
 ::selection {
@@ -142,9 +145,6 @@ li::marker { font-weight: bold; }
   text-overflow: ellipsis;
 }
 
-@keyframes translateX { to { transform: translateX(-100%); } }
-[data-css-marquee-list] { animation: translateX linear infinite paused; }
-
 /* === SWIPER OVERFLOW (scoped; avoids breaking other sliders) === */
 .swiper.is-team,
 .swiper.is-team .swiper-wrapper,
@@ -174,9 +174,6 @@ li::marker { font-weight: bold; }
 [data-animate="reveal-list"] > :nth-child(4) { --i: 3; }
 [data-animate="reveal-list"] > :nth-child(5) { --i: 4; }
 [data-animate="reveal-list"] > :nth-child(6) { --i: 5; }
-
-.reset-animations,
-.reset-animations * { animation: none !important; }
 
 /* NOTE: powerful rule (kept from original) */
 [data-css-scroll].animation-ready,
@@ -320,12 +317,7 @@ li::marker { font-weight: bold; }
 
 /* Tabs */
 .nav-tab_icon.default { opacity: 1; }
-.nav-tab_icon.current { opacity: 0; }
 
-.nav-tab.w--current .nav-tab_icon.current,
-[data-accordion-status="active"] .nav-tab_icon.current {
-  opacity: 1;
-}
 
 .nav-tab.w--current .nav-tab_icon.default,
 [data-accordion-status="active"] .nav-tab_icon.default {
@@ -345,7 +337,6 @@ li::marker { font-weight: bold; }
 .nav-cta_image,
 .main-card-image_wrap,
 .glass-icon_wrapper,
-.has-clippath,
 .team-card-image_wrapper,
 .testimonial-card {
   clip-path: polygon(0 0, 100% 0, 100% 100%, 100% 100%, 0 100%);
@@ -509,8 +500,7 @@ li::marker { font-weight: bold; }
   [data-animate] > *,
   .background-chevron,
   .modal-background-chevron,
-  .background-chevron_cta,
-  [data-css-marquee-list] {
+  .background-chevron_cta {
     animation: none !important;
     transition: none !important;
     transform: none !important;
@@ -521,7 +511,6 @@ li::marker { font-weight: bold; }
 @media print {
   .navbar,
   .topbar,
-  .footer,
   .modal-wrapper,
   .nav-overlay {
     display: none !important;

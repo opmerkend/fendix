@@ -1,5 +1,9 @@
 /* ==========================================================================
-   ANIMATE.CSS 
+   ANIMATE.CSS (v1.11.0)
+   BEWUST een apart bestand naast lazy.css (besluit 16-07-2026):
+   dit bestand laadt VROEG (synchroon in de footer) omdat het initial-states
+   zet en flitsen voorkomt; lazy.css laadt UITGESTELD via de media="print"-truc.
+   Samenvoegen zou die laadstrategie opheffen voor ~1 gespaarde request.
    ========================================================================== */
 
 /* =========================
