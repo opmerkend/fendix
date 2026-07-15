@@ -1,6 +1,8 @@
 /**
- * SWIPER-INIT.JS v1.10.0
- * All Swiper slider configurations for Fendix (incl. hero coverflow, voorheen page-code)
+ * SWIPER-INIT.JS v1.12.0
+ * All Swiper slider configurations for Fendix (incl. hero coverflow)
+ * v1.12.0: a11y — slides krijgen role="listitem" wanneer de wrapper een
+ * Webflow-collectielijst is (role="list"); Swiper zette standaard "group"
  */
 (function () {
   'use strict';
@@ -81,6 +83,13 @@
       var nav = getNavConfig(component);
       var opts = optionsFactory(component, nav);
 
+      // A11y: Webflow-collectielijsten hebben role="list" op de wrapper;
+      // slides horen daarbinnen role="listitem" te zijn (Swiper-standaard is "group")
+      var wrapper = el.querySelector('.swiper-wrapper');
+      if (wrapper && wrapper.getAttribute('role') === 'list') {
+        opts.a11y = Object.assign({ slideRole: 'listitem' }, opts.a11y);
+      }
+
       var swiper = new Swiper(el, opts);
       if (opts && opts._activeClass) attachActiveClass(swiper);
     });
@@ -97,7 +106,7 @@
       var slides = el.querySelectorAll('.swiper-slide');
       if (slides.length <= 1) return; // geen autoplay/slider nodig bij 1 slide
 
-      new Swiper(el, {
+      var heroOpts = {
         slidesPerView: 1,
         effect: 'coverflow',
         coverflowEffect: {
@@ -125,7 +134,12 @@
             coverflowEffect: { scale: 0.85, slideShadows: false }
           }
         }
-      });
+      };
+      var heroWrapper = el.querySelector('.swiper-wrapper');
+      if (heroWrapper && heroWrapper.getAttribute('role') === 'list') {
+        heroOpts.a11y = { slideRole: 'listitem' };
+      }
+      new Swiper(el, heroOpts);
     });
 
     // =========================
