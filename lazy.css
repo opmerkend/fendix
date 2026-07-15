@@ -1,5 +1,5 @@
 /* ==========================================================================
-   LAZY.CSS (v1.11.0 — dode regels verwijderd na sitebrede gebruiksscan 16-07-2026)
+   LAZY.CSS (v1.13.0 — per-page-CSS compat-blok toegevoegd, zie onderaan)
    Geschrapt: css-marquee (vervangen door data-draggable-marquee in fendix.js),
    .reset-animations, .has-clippath, .footer (class bestaat niet),
    .nav-tab_icon.current (combo-class bestaat niet meer in Webflow)
@@ -517,4 +517,28 @@ li::marker { font-weight: bold; }
   }
 
   .section { break-inside: avoid; }
+}
+
+/* ==========================================================================
+   PER-PAGE-CSS COMPAT (v1.13.0)
+   Webflow's per-page CSS + Finsweet-injectie kan framework-regels NA de
+   eigen combo-styles in de cascade plaatsen; bij gelijke specificiteit wint
+   dan de framework-look (checkbox #3898ec i.p.v. merk-paars). Dit blok
+   herbevestigt de merk-styling met een specificiteitstrap extra
+   (.w-checkbox-input erbij), zodat bestandsvolgorde niet meer uitmaakt.
+   Declaraties = exact de Designer-waarden (monoliet 16-07-2026).
+   ========================================================================== */
+.w-checkbox-input.checkbox.w--redirected-checked {
+  border-color: var(--_effects---brand-gradients--proactive-purple-end);
+  background-color: var(--swatch--proactive-purple);
+  background-image: url(https://cdn.prod.website-files.com/693ab098ced1619a3009f4fe/693ab098ced1619a3009f576_check.svg);
+  background-size: 1rem 1rem;
+}
+
+.w-checkbox-input.checkbox.alt.w--redirected-checked {
+  color: var(--swatch--proactive-purple);
+  background-image: none;
+  background-repeat: repeat;
+  background-size: auto;
+  background-color: color-mix(in srgb, var(--swatch--proactive-purple) 15%, white);
 }

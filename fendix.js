@@ -1,5 +1,5 @@
 /**
- * FENDIX.JS v1.12.1 — marquee + Finsweet-loader + menu-warmup + team-lijst + reflow-fix textarea */
+ * FENDIX.JS v1.13.0 — marquee + Finsweet-loader + menu-warmup + team-lijst + css-volgorde-wachter v2 */
 (function () {
   'use strict';
 
@@ -647,6 +647,62 @@
       } else {
         setTimeout(warm, 2500);
       }
+    })();
+
+    // =========================
+    // CSS-VOLGORDE-WACHTER (v1.13.0)
+    // Bij per-page CSS importeert Finsweet (nest/load/inject) runtime de css
+    // van bronpagina's. Die bestanden bevatten framework-duplicaten die NA de
+    // eigen pagina-css komen en merk-styling overschrijven bij gelijke
+    // specificiteit. Deze wachter zet de eigen pagina-css terug achteraan in
+    // de head zodra er een vreemd Webflow-css-bestand bijkomt. Geimporteerde
+    // styles blijven beschikbaar (nodig voor geneste content), maar de
+    // cascade eindigt weer met de juiste bestanden.
+    // =========================
+    (function () {
+      var head = document.head;
+      if (!head) return;
+      var initieel = [];
+      var links = document.querySelectorAll('link[rel="stylesheet"]');
+      var paginaCss = null;
+      for (var i = 0; i < links.length; i++) {
+        initieel.push(links[i].href);
+        if (links[i].href.indexOf('website-files.com') !== -1 && links[i].href.indexOf('.shared.') === -1 && links[i].href.indexOf('.css') !== -1) {
+          paginaCss = links[i];
+        }
+      }
+      if (!paginaCss) return;
+      // onze eigen head-style (secties 1-11) moet als allerlaatste blijven:
+      // die overschrijft bewust Designer-regels (o.a. topbar_background height)
+      var eigenStyle = null;
+      var styles = document.querySelectorAll('style');
+      for (var s = 0; s < styles.length; s++) {
+        if (styles[s].textContent.indexOf('--nav-duration') !== -1) { eigenStyle = styles[s]; break; }
+      }
+      var gepland = false;
+      function herstelVolgorde() {
+        if (gepland) return;
+        gepland = true;
+        requestAnimationFrame(function () {
+          head.appendChild(paginaCss);
+          if (eigenStyle) head.appendChild(eigenStyle);
+          gepland = false;
+        });
+      }
+      new MutationObserver(function (mutaties) {
+        for (var m = 0; m < mutaties.length; m++) {
+          var nieuw = mutaties[m].addedNodes;
+          for (var n = 0; n < nieuw.length; n++) {
+            var el = nieuw[n];
+            if (el.tagName === 'LINK' && el.rel === 'stylesheet' &&
+                el.href.indexOf('website-files.com') !== -1 &&
+                initieel.indexOf(el.href) === -1) {
+              herstelVolgorde();
+              return;
+            }
+          }
+        }
+      }).observe(document.documentElement, { childList: true, subtree: true });
     })();
 
     // =========================
