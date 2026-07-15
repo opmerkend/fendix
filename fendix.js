@@ -1,5 +1,5 @@
 /**
- * FENDIX.JS v1.10.0 — marquee + Finsweet-loader + menu-warmup + team-lijst module */
+ * FENDIX.JS v1.12.1 — marquee + Finsweet-loader + menu-warmup + team-lijst + reflow-fix textarea */
 (function () {
   'use strict';
 
@@ -433,7 +433,9 @@
     })();
 
     // =========================
-    // FORM ENHANCANCEMENT (textarea autosize)
+    // FORM ENHANCEMENT (textarea autosize)
+    // v1.12.1: initiele resize alleen bij vooringevulde tekst -
+    // lege textareas triggerden bij page load een forced reflow per veld (PSI)
     // =========================
     document.querySelectorAll('textarea').forEach(function (textarea) {
       function resize() {
@@ -441,7 +443,7 @@
         textarea.style.height = textarea.scrollHeight + 'px';
       }
       textarea.addEventListener('input', resize, { passive: true });
-      resize();
+      if (textarea.value) resize();
     });
 
     // =========================
