@@ -1,0 +1,23 @@
+name: Valideer code
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  valideer:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Haal code op
+        uses: actions/checkout@v4
+
+      - name: Zet Node.js klaar
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Installeer csstree-validator
+        run: npm install -g csstree-validator
+
+      - name: Draai de validator
+        run: node tools/validate.js
